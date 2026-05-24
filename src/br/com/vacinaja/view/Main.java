@@ -104,42 +104,98 @@ public class Main {
         }
     }
 
+    
+
     private static void registrarVacinacao() {
-        System.out.println("\nRegistrar vacinação"); 
-        System.out.println("Usuários cadastrados:"); 
-        List<Usuario> usuarios = usuarioService.listarUsuarios();
-        for (int i = 0; i < usuarios.size(); i++) {
-            System.out.println((i + 1) + "- " + usuarios.get(i).getNome() + " (" + usuarios.get(i).getIdade() + " anos)"); 
-        }
-        System.out.print("Escolha o usuário (número): "); 
-        int userIndex = Integer.parseInt(scanner.nextLine()) - 1;
-        Usuario usuario = usuarios.get(userIndex);
-
-        System.out.println("\nVacinas disponíveis no sistema:"); 
-        List<Vacina> vacinas = vacinaService.listarVacinas();
-        for (int i = 0; i < vacinas.size(); i++) {
-            System.out.println((i + 1) + "- " + vacinas.get(i).getNome()); 
-        }
-        System.out.print("Escolha a vacina (número): "); 
-        int vacIndex = Integer.parseInt(scanner.nextLine()) - 1;
-        Vacina vacina = vacinas.get(vacIndex);
-
-        System.out.print("Data da vacinação (dd/mm/aaaa): "); 
-        String dataStr = scanner.nextLine();
-        System.out.print("Dose (1/2/3/Única/Reforço): "); 
-        String dose = scanner.nextLine();
-        
         try {
-            Date data = sdf.parse(dataStr);
-            // Assumindo o primeiro posto para simplificar o exemplo prático
-            PostoSaude posto = postoService.listarPostos().get(0); 
-            usuarioService.registrarVacinacao(usuario, vacina, dose, data, posto);
-            System.out.println("Registro realizado com sucesso!"); 
+            System.out.println("\nRegistrar vacinação"); // [cite: 209]
+
+            // 1. SELEÇÃO E VALIDAÇÃO DE USUÁRIO
+            List<Usuario> usuarios = usuarioService.listarUsuarios();
+            if (usuarios.isEmpty()) {
+                System.out.println("Nenhum usuário cadastrado no sistema.");
+                return;
+            }
+            
+            System.out.println("Usuários cadastrados:"); // [cite: 210]
+            for (int i = 0; i < usuarios.size(); i++) {
+                System.out.println((i + 1) + "- " + usuarios.get(i).getNome() + " (" + usuarios.get(i).getIdade() + " anos)");
+            }
+            System.out.print("Escolha o usuário (número): "); // [cite: 211]
+            int userIndex = Integer.parseInt(scanner.nextLine()) - 1;
+
+            // VALIDAÇÃO DE ÍNDICE: Impede 'IndexOutOfBoundsException' se o usuário digitar um número fora da lista
+            if (userIndex < 0 || userIndex >= usuarios.size()) {
+                System.out.println("Erro: Usuário não encontrado na lista.");
+                return;
+            }
+            Usuario usuario = usuarios.get(userIndex);
+
+            // 2. SELEÇÃO E VALIDAÇÃO DE VACINA
+            List<Vacina> vacinas = vacinaService.listarVacinas();
+            if (vacinas.isEmpty()) {
+                System.out.println("Nenhuma vacina cadastrada no sistema.");
+                return;
+            }
+            
+            System.out.println("\nVacinas disponíveis para registro:"); // [cite: 212]
+            for (int i = 0; i < vacinas.size(); i++) {
+                System.out.println((i + 1) + "- " + vacinas.get(i).getNome());
+            }
+            System.out.print("Escolha a vacina (número): "); // [cite: 216]
+            int vacIndex = Integer.parseInt(scanner.nextLine()) - 1;
+
+            if (vacIndex < 0 || vacIndex >= vacinas.size()) {
+                System.out.println("Erro: Vacina não encontrada na lista.");
+                return;
+            }
+            Vacina vacina = vacinas.get(vacIndex);
+
+            // 3. SELEÇÃO E VALIDAÇÃO DE POSTO DE SAÚDE
+            List<PostoSaude> postos = postoService.listarPostos();
+            if (postos.isEmpty()) {
+                System.out.println("Nenhum posto de saúde cadastrado no sistema.");
+                return;
+            }
+            
+            System.out.println("\nPostos de saúde disponíveis:");
+            for (int i = 0; i < postos.size(); i++) {
+                System.out.println((i + 1) + "- " + postos.get(i).getNome());
+            }
+            System.out.print("Escolha o posto onde tomou (número): "); 
+            int postoIndex = Integer.parseInt(scanner.nextLine()) - 1;
+
+            if (postoIndex < 0 || postoIndex >= postos.size()) {
+                System.out.println("Erro: Posto de saúde não encontrado na lista.");
+                return;
+            }
+            PostoSaude posto = postos.get(postoIndex);
+
+            // 4. DADOS DA APLICAÇÃO (DATA E DOSE)
+            System.out.print("\nData da vacinação (dd/mm/aaaa): "); // [cite: 217]
+            String dataStr = scanner.nextLine();
+            
+            System.out.print("Dose (1/2/3/Única/Reforço): "); // [cite: 219]
+            String dose = scanner.nextLine();
+            
+            // CONVERSÃO DE DATA E EFETIVAÇÃO DO REGISTRO
+            // O sdf.parse pode lançar um ParseException se a pessoa digitar "15 de março" em vez de "15/03/2026"
+            Date data = sdf.parse(dataStr); 
+            usuarioService.registrarVacinacao(usuario, vacina, dose, data, posto); // [cite: 156, 162]
+            
+            System.out.println("Registro realizado com sucesso!"); // [cite: 220]
+
+        // CONCEITO POO - TRATAMENTO DE EXCEÇÕES:
+        // Captura diferentes tipos de falhas e exibe mensagens amigáveis em vez de crashar o console.
+        } catch (NumberFormatException e) {
+            System.out.println("Erro: Você deve digitar o NÚMERO correspondente na lista, não letras ou espaços.");
         } catch (ParseException e) {
-            System.out.println("Erro formato de data inválido.");
+            System.out.println("Erro: Formato de data inválido. Use exatamente o padrão dd/mm/aaaa (ex: 15/03/2026).");
+        } catch (Exception e) {
+            System.out.println("Erro inesperado ao registrar vacinação: " + e.getMessage());
         }
     }
-
+    
     private static void verificarPendencias() {
         System.out.println("\nVerificar pendências"); 
         List<Usuario> usuarios = usuarioService.listarUsuarios();
@@ -167,26 +223,48 @@ public class Main {
     }
 
     private static void gerenciarUsuarios() {
-        System.out.println("\nGerenciar usuários"); 
-        System.out.println("1- Cadastrar novo usuário"); 
-        System.out.println("2- Listar usuários"); 
-        System.out.print("Escolha: "); 
-        int opcao = Integer.parseInt(scanner.nextLine());
-
-        if (opcao == 1) {
-            System.out.print("Nome: "); 
-            String nome = scanner.nextLine();
-            System.out.print("Idade: "); 
-            int idade = Integer.parseInt(scanner.nextLine());
-            
+        System.out.println("\nGerenciar usuários");
+        System.out.println("1- Cadastrar novo usuário (Nome e Idade)");
+        System.out.println("2- Cadastrar novo usuário (Somente Nome - Demonstra Sobrecarga)");
+        System.out.println("3- Listar usuários");
+        System.out.print("Escolha: ");
+        
+        try {
+            int opcao = Integer.parseInt(scanner.nextLine());
             int novoId = usuarioService.listarUsuarios().size() + 1;
-            Usuario novoUser = new Usuario(novoId, nome, idade);
-            usuarioService.cadastrarUsuario(novoUser);
-            System.out.println("Usuário cadastrado com sucesso! ID: " + novoId); 
-        } else if (opcao == 2) {
-            for (Usuario u : usuarioService.listarUsuarios()) {
-                System.out.println(u.toString());
+
+            if (opcao == 1) {
+                System.out.print("Nome: ");
+                String nome = scanner.nextLine();
+                System.out.print("Idade: ");
+                int idade = Integer.parseInt(scanner.nextLine());
+                
+                // Tenta criar o usuário. Se a idade for negativa, o setter do Model lança um erro que é pego pelo catch.
+                Usuario novoUser = new Usuario(novoId, nome, idade);
+                usuarioService.cadastrarUsuario(novoUser);
+                
+            } else if (opcao == 2) {
+                System.out.print("Nome: ");
+                String nome = scanner.nextLine();
+                
+                // DEMONSTRAÇÃO DE SOBRECARGA: Chamando o construtor que não exige a idade.
+                Usuario novoUser = new Usuario(novoId, nome);
+                usuarioService.cadastrarUsuario(novoUser);
+                System.out.println("Usuário cadastrado com a sobrecarga de construtor (Idade padrão: 0).");
+                
+            } else if (opcao == 3) {
+                for (Usuario u : usuarioService.listarUsuarios()) {
+                    System.out.println(u.toString());
+                }
+            } else {
+                System.out.println("Opção inválida.");
             }
+        // CONCEITO POO - TRATAMENTO DE EXCEÇÕES:
+        // Se o IllegalArgumentException for acionado na classe Usuario, nós o capturamos aqui para avisar o operador.
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Erro: Entrada inválida. Certifique-se de digitar números onde solicitado.");
         }
     }
 
