@@ -1,5 +1,8 @@
 package br.com.vacinaja.model;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class Vacina {
     private int id;
     private String nome;
@@ -34,6 +37,17 @@ public class Vacina {
     public void setDosesNecessarias(int dosesNecessarias) { this.dosesNecessarias = dosesNecessarias; }
     public int getIntervaloDoses() { return intervaloDoses; }
     public void setIntervaloDoses(int intervaloDoses) { this.intervaloDoses = intervaloDoses; }
+
+    public Date calcularProximaDose(Date dataUltimaDose) {
+        if (this.dosesNecessarias <= 1) {
+            return null; // Dose única não tem próxima dose
+        }
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dataUltimaDose);
+        cal.add(Calendar.DAY_OF_MONTH, this.intervaloDoses);
+        return cal.getTime();
+    }
 
     @Override
     public String toString() {
