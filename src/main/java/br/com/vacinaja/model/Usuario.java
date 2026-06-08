@@ -1,6 +1,8 @@
 package br.com.vacinaja.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +12,11 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @NotBlank(message = "O nome não pode estar em branco")
     @Column(nullable = false)
     private String nome;
     
+    @Min(value = 0, message = "A idade não pode ser negativa")
     private int idade;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)

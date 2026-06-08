@@ -26,6 +26,11 @@ public class MvcController {
         this.campanhaService = campanhaService;
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
     @GetMapping("/")
     public String vacinas(Model model, @RequestParam(required = false) Integer idade) {
         model.addAttribute("view", "vacinas");
@@ -108,9 +113,13 @@ public class MvcController {
     }
 
     @PostMapping("/usuarios")
-    public String cadastrarUsuario(@RequestParam String nome, @RequestParam int idade) {
-        Usuario novo = new Usuario(nome, idade);
+    public String cadastrarUsuario(@jakarta.validation.Valid @ModelAttribute Usuario novo, org.springframework.validation.BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("erroValidacao", result.getAllErrors().get(0).getDefaultMessage());
+            return "redirect:/usuarios";
+        }
         usuarioService.cadastrarUsuario(novo);
+        redirectAttributes.addFlashAttribute("mensagem", "Usuário cadastrado com sucesso!");
         return "redirect:/usuarios";
     }
 }

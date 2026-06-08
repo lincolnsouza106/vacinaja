@@ -21,6 +21,18 @@
                 <li><a th:href="@{/campanhas}" th:class="${view == 'campanhas'} ? 'nav-item active' : 'nav-item'">Campanhas Atuais</a></li>
                 <li><a th:href="@{/usuarios}" th:class="${view == 'usuarios'} ? 'nav-item active' : 'nav-item'">Gerenciar Usuários</a></li>
             </ul>
+            
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <div th:if="${#authorization.expression('isAuthenticated()')}">
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 0.5rem;" th:text="'Olá, ' + ${#authentication.name}"></p>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn" style="padding: 0.5rem; font-size: 0.9rem;">Sair</button>
+                    </form>
+                </div>
+                <div th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a th:href="@{/login}" class="btn" style="display:block; text-align:center; padding: 0.5rem; font-size: 0.9rem; text-decoration:none;">Área Restrita</a>
+                </div>
+            </div>
         </aside>
         
         <main class="content">

@@ -143,6 +143,8 @@
                     </div>
                     <button type="submit" class="btn">Cadastrar</button>
                 </form>
+                <div th:if="${erroValidacao != null}" style="margin-top: 1rem; color: #ef4444; font-weight: 500;" th:text="${erroValidacao}"></div>
+                <div th:if="${mensagem != null}" style="margin-top: 1rem; color: #10b981; font-weight: 500;" th:text="${mensagem}"></div>
             </div>
             <div style="flex:1; min-width: 250px;">
                 <h3>Lista de Usuários</h3>
