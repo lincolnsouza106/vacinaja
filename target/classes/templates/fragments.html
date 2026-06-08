@@ -13,14 +13,14 @@
             <button type="submit" class="btn">Consultar</button>
         </form>
         
-        <div style="margin-top: 2rem;">
-            <div th:if="${idade != null and (vacinas == null or vacinas.isEmpty())}">
-                <p>Nenhuma vacina recomendada para essa idade no momento.</p>
+        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            <div th:if="${idade != null and (vacinas == null or vacinas.isEmpty())}" style="grid-column: 1 / -1;">
+                <p class="text-muted">Nenhuma vacina recomendada para essa idade no momento.</p>
             </div>
-            <div th:each="v : ${vacinas}" class="card">
+            <div th:each="v : ${vacinas}" class="card" style="margin-bottom: 0;">
                 <h3 th:text="${v.nome}"></h3>
-                <p>Previne: <span th:text="${v.doencaPrevenida}"></span></p>
-                <p>Doses necessárias: <span th:text="${v.dosesNecessarias}"></span></p>
+                <p>Previne: <strong th:text="${v.doencaPrevenida}"></strong></p>
+                <p>Doses: <strong th:text="${v.dosesNecessarias}"></strong></p>
             </div>
         </div>
     </div>
@@ -40,15 +40,15 @@
             <button type="submit" class="btn">Buscar</button>
         </form>
         
-        <div style="margin-top: 2rem;">
-            <div th:if="${buscou != null and (postos == null or postos.isEmpty())}">
-                <p>Nenhum posto encontrado com esses critérios.</p>
+        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+            <div th:if="${buscou != null and (postos == null or postos.isEmpty())}" style="grid-column: 1 / -1;">
+                <p class="text-muted">Nenhum posto encontrado com esses critérios.</p>
             </div>
-            <div th:each="p : ${postos}" class="card">
+            <div th:each="p : ${postos}" class="card" style="margin-bottom: 0;">
                 <h3 th:text="${p.nome}"></h3>
-                <p>Endereço: <span th:text="${p.endereco}"></span></p>
-                <p>Horário: <span th:text="${p.horarioFuncionamento}"></span></p>
-                <p>Telefone: <span th:text="${p.telefone}"></span></p>
+                <p>Endereço: <strong th:text="${p.endereco}"></strong></p>
+                <p>Horário: <strong th:text="${p.horarioFuncionamento}"></strong></p>
+                <p>Telefone: <strong th:text="${p.telefone}"></strong></p>
             </div>
         </div>
     </div>
@@ -101,13 +101,13 @@
             <button type="submit" class="btn">Verificar</button>
         </form>
         
-        <div style="margin-top: 2rem;">
-            <div th:if="${buscou != null and (pendentes == null or pendentes.isEmpty())}">
-                <p style="color:#10b981">Carteira de vacinação em dia! Nenhuma pendência.</p>
+        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            <div th:if="${buscou != null and (pendentes == null or pendentes.isEmpty())}" style="grid-column: 1 / -1;">
+                <p class="text-success" style="font-weight: 500;">Carteira de vacinação em dia! Nenhuma pendência.</p>
             </div>
-            <div th:each="v : ${pendentes}" class="card">
-                <h3 style="color:#ef4444" th:text="${v.nome}"></h3>
-                <p>Faltam doses. Requeridas: <span th:text="${v.dosesNecessarias}"></span></p>
+            <div th:each="v : ${pendentes}" class="card" style="margin-bottom: 0; border-left: 4px solid var(--danger);">
+                <h3 class="text-danger" th:text="${v.nome}"></h3>
+                <p>Faltam doses. Requeridas: <strong th:text="${v.dosesNecessarias}"></strong></p>
             </div>
         </div>
     </div>
@@ -115,14 +115,16 @@
     <!-- Fragment: Campanhas -->
     <div th:fragment="campanhas">
         <h2>Campanhas Atuais</h2>
-        <div th:if="${campanhas == null or campanhas.isEmpty()}">
-            <p>Nenhuma campanha ativa.</p>
+        <div th:if="${campanhas == null or campanhas.isEmpty()}" style="margin-top: 2rem;">
+            <p class="text-muted">Nenhuma campanha ativa no momento.</p>
         </div>
-        <div th:each="c : ${campanhas}" class="card">
-            <h3 th:text="${c.nome}"></h3>
-            <p th:text="${c.descricao}"></p>
-            <p><strong>Público:</strong> <span th:text="${c.publicoAlvo}"></span></p>
-            <p><strong>Período:</strong> <span th:text="${#dates.format(c.dataInicio, 'dd/MM/yyyy')} + ' a ' + ${#dates.format(c.dataFim, 'dd/MM/yyyy')}"></span></p>
+        <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+            <div th:each="c : ${campanhas}" class="card" style="margin-bottom: 0; border-top: 4px solid var(--primary);">
+                <h3 th:text="${c.nome}"></h3>
+                <p th:text="${c.descricao}" style="margin-bottom: 1rem;"></p>
+                <p><strong>Público:</strong> <span th:text="${c.publicoAlvo}"></span></p>
+                <p><strong>Período:</strong> <span th:text="${#dates.format(c.dataInicio, 'dd/MM/yyyy')} + ' a ' + ${#dates.format(c.dataFim, 'dd/MM/yyyy')}"></span></p>
+            </div>
         </div>
     </div>
 
