@@ -15,17 +15,17 @@
         <!-- Top Navbar -->
         <nav class="navbar">
             <a href="/" class="navbar-brand">
-                💉 VacinaBrasil <span>Sistema Nacional de Vacinação</span>
+                VacinaBrasil <span>Sistema Nacional de Vacinação</span>
             </a>
             
             <ul class="nav-links">
-                <li><a th:href="@{/}" th:class="${view == 'vacinas'} ? 'nav-item active' : 'nav-item'">🏠 Início</a></li>
-                <li><a th:href="@{/postos}" th:class="${view == 'postos'} ? 'nav-item active' : 'nav-item'">📍 Postos de Vacinação</a></li>
-                <li><a th:href="@{/campanhas}" th:class="${view == 'campanhas'} ? 'nav-item active' : 'nav-item'">📢 Campanhas</a></li>
-                <li><a th:href="@{/registrar}" th:class="${view == 'registrar'} ? 'nav-item active' : 'nav-item'">💳 Carteira Digital</a></li>
-                <li><a th:href="@{/pendencias}" th:class="${view == 'pendencias'} ? 'nav-item active' : 'nav-item'">📅 Agendamento</a></li>
+                <li><a th:href="@{/}" th:class="${view == 'vacinas'} ? 'nav-item active' : 'nav-item'">Início</a></li>
+                <li><a th:href="@{/postos}" th:class="${view == 'postos'} ? 'nav-item active' : 'nav-item'">Postos de Vacinação</a></li>
+                <li><a th:href="@{/campanhas}" th:class="${view == 'campanhas'} ? 'nav-item active' : 'nav-item'">Campanhas</a></li>
+                <li><a th:href="@{/registrar}" th:class="${view == 'registrar'} ? 'nav-item active' : 'nav-item'">Carteira Digital</a></li>
+                <li><a th:href="@{/pendencias}" th:class="${view == 'pendencias'} ? 'nav-item active' : 'nav-item'">Agendamento</a></li>
                 <!-- Apenas Admin vê Gerenciamento -->
-                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/usuarios}" th:class="${view == 'usuarios'} ? 'nav-item active' : 'nav-item'">⚙️ Gerenciar Usuários</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/usuarios}" th:class="${view == 'usuarios'} ? 'nav-item active' : 'nav-item'">Gerenciar Usuários</a></li>
             </ul>
 
             <div class="nav-user">
@@ -36,7 +36,7 @@
                     </form>
                 </div>
                 <div sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/login}" class="btn" style="background: white; color: var(--primary);">Entrar (Gov.br)</a>
+                    <a th:href="@{/login}" class="btn" style="background: white; color: var(--primary);">Entrar</a>
                 </div>
             </div>
         </nav>
@@ -50,7 +50,7 @@
         <main class="content-wrapper">
             <!-- Alert Banner (Somente na Home e se logado) -->
             <div sec:authorize="isAuthenticated()" th:if="${view == 'vacinas'}" class="alert-banner">
-                ⚠️ Dose pendente: COVID-19 — agendada para 14 de fevereiro de 2026
+                <span style="font-weight:700; margin-right:0.5rem;">Alerta:</span> Dose pendente: COVID-19 — agendada para 14 de fevereiro de 2026
                 <a href="/pendencias">Ver detalhes</a>
             </div>
 

@@ -52,7 +52,7 @@
             <div>
                 <h3 style="font-size: 1rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;">Campanhas em Andamento</h3>
                 <div class="list-item">
-                    <div class="list-item-icon">🦠</div>
+                    <div class="list-item-icon" style="font-size: 1rem;">Camp</div>
                     <div class="list-item-content" style="flex:1;">
                         <h3 style="font-size:1.05rem;">Campanha Nacional contra a Gripe</h3>
                         <p>Proteja-se contra o vírus da gripe. Vacina disponível.</p>
@@ -62,7 +62,7 @@
                 </div>
                 <!-- Optional: Use the real vacinas list here as a fallback -->
                 <div th:each="v : ${vacinas}" class="list-item">
-                    <div class="list-item-icon">💉</div>
+                    <div class="list-item-icon" style="font-size: 1rem;">Vac</div>
                     <div class="list-item-content">
                         <h3 th:text="${v.nome}" style="font-size:1.05rem;"></h3>
                         <p>Previne: <strong th:text="${v.doencaPrevenida}"></strong></p>
@@ -73,9 +73,9 @@
             <div>
                 <h3 style="font-size: 1rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;">Acesso Rápido</h3>
                 <div class="card" style="padding: 1rem;">
-                    <a th:href="@{/postos}" style="display:block; text-decoration:none; color:var(--text-main); margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">📍 Postos Credenciados</a>
-                    <a th:href="@{/registrar}" style="display:block; text-decoration:none; color:var(--text-main); margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">💳 Carteira Digital</a>
-                    <a th:href="@{/pendencias}" style="display:block; text-decoration:none; color:var(--text-main);">📅 Agendar Vacina</a>
+                    <a th:href="@{/postos}" style="display:block; text-decoration:none; color:var(--text-main); margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">Postos Credenciados</a>
+                    <a th:href="@{/registrar}" style="display:block; text-decoration:none; color:var(--text-main); margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">Carteira Digital</a>
+                    <a th:href="@{/pendencias}" style="display:block; text-decoration:none; color:var(--text-main);">Agendar Vacina</a>
                 </div>
             </div>
         </div>
