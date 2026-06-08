@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <!-- Fragment: Vacinas -->
+    <div th:fragment="vacinas">
+        <h2>Consultar Vacinas Recomendadas</h2>
+        <form th:action="@{/}" method="get">
+            <div class="form-group">
+                <label>Informe sua idade:</label>
+                <input type="number" name="idade" class="form-control" placeholder="Ex: 25" th:value="${idade}" required>
+            </div>
+            <button type="submit" class="btn">Consultar</button>
+        </form>
+        
+        <div style="margin-top: 2rem;">
+            <div th:if="${idade != null and (vacinas == null or vacinas.isEmpty())}">
+                <p>Nenhuma vacina recomendada para essa idade no momento.</p>
+            </div>
+            <div th:each="v : ${vacinas}" class="card">
+                <h3 th:text="${v.nome}"></h3>
+                <p>Previne: <span th:text="${v.doencaPrevenida}"></span></p>
+                <p>Doses necessárias: <span th:text="${v.dosesNecessarias}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fragment: Postos -->
+    <div th:fragment="postos">
+        <h2>Localizar Posto de Saúde</h2>
+        <form th:action="@{/postos}" method="get">
+            <div class="form-group">
+                <label>Região (Opcional):</label>
+                <input type="text" name="regiao" class="form-control" placeholder="Ex: Zona Sul" th:value="${regiao}">
+            </div>
+            <div class="form-group">
+                <label>Vacina desejada (Opcional):</label>
+                <input type="text" name="vacinaNome" class="form-control" placeholder="Ex: Gripe" th:value="${vacinaNome}">
+            </div>
+            <button type="submit" class="btn">Buscar</button>
+        </form>
+        
+        <div style="margin-top: 2rem;">
+            <div th:if="${buscou != null and (postos == null or postos.isEmpty())}">
+                <p>Nenhum posto encontrado com esses critérios.</p>
+            </div>
+            <div th:each="p : ${postos}" class="card">
+                <h3 th:text="${p.nome}"></h3>
+                <p>Endereço: <span th:text="${p.endereco}"></span></p>
+                <p>Horário: <span th:text="${p.horarioFuncionamento}"></span></p>
+                <p>Telefone: <span th:text="${p.telefone}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fragment: Registrar -->
+    <div th:fragment="registrar">
+        <h2>Registrar Vacinação</h2>
+        <form th:action="@{/registrar}" method="post">
+            <div class="form-group">
+                <label>Usuário:</label>
+                <select name="usuarioId" class="form-control" required>
+                    <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nome + ' (' + u.idade + ' anos)'}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Vacina:</label>
+                <select name="vacinaId" class="form-control" required>
+                    <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Posto de Saúde:</label>
+                <select name="postoId" class="form-control" required>
+                    <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Data da Aplicação:</label>
+                <input type="date" name="data" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Dose (1, 2, Única, Reforço):</label>
+                <input type="text" name="dose" class="form-control" value="1" required>
+            </div>
+            <button type="submit" class="btn">Salvar Registro</button>
+        </form>
+        <div th:if="${mensagem != null}" style="margin-top: 1rem; color: #10b981; font-weight: 500;" th:text="${mensagem}"></div>
+    </div>
+
+    <!-- Fragment: Pendencias -->
+    <div th:fragment="pendencias">
+        <h2>Verificar Pendências</h2>
+        <form th:action="@{/pendencias}" method="get">
+            <div class="form-group">
+                <label>Selecione o Usuário:</label>
+                <select name="usuarioId" class="form-control" required>
+                    <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nome}" th:selected="${u.id == usuarioId}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Verificar</button>
+        </form>
+        
+        <div style="margin-top: 2rem;">
+            <div th:if="${buscou != null and (pendentes == null or pendentes.isEmpty())}">
+                <p style="color:#10b981">Carteira de vacinação em dia! Nenhuma pendência.</p>
+            </div>
+            <div th:each="v : ${pendentes}" class="card">
+                <h3 style="color:#ef4444" th:text="${v.nome}"></h3>
+                <p>Faltam doses. Requeridas: <span th:text="${v.dosesNecessarias}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fragment: Campanhas -->
+    <div th:fragment="campanhas">
+        <h2>Campanhas Atuais</h2>
+        <div th:if="${campanhas == null or campanhas.isEmpty()}">
+            <p>Nenhuma campanha ativa.</p>
+        </div>
+        <div th:each="c : ${campanhas}" class="card">
+            <h3 th:text="${c.nome}"></h3>
+            <p th:text="${c.descricao}"></p>
+            <p><strong>Público:</strong> <span th:text="${c.publicoAlvo}"></span></p>
+            <p><strong>Período:</strong> <span th:text="${#dates.format(c.dataInicio, 'dd/MM/yyyy')} + ' a ' + ${#dates.format(c.dataFim, 'dd/MM/yyyy')}"></span></p>
+        </div>
+    </div>
+
+    <!-- Fragment: Usuarios -->
+    <div th:fragment="usuarios">
+        <h2>Gerenciar Usuários</h2>
+        <div style="display:flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex:1; min-width: 250px;">
+                <form th:action="@{/usuarios}" method="post" class="card">
+                    <h3>Novo Usuário</h3>
+                    <div class="form-group">
+                        <label>Nome:</label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Idade:</label>
+                        <input type="number" name="idade" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn">Cadastrar</button>
+                </form>
+            </div>
+            <div style="flex:1; min-width: 250px;">
+                <h3>Lista de Usuários</h3>
+                <div style="margin-top:1rem; max-height:400px; overflow-y:auto; padding-right:10px;">
+                    <div th:each="u : ${usuarios}" class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 th:text="${u.nome}"></h3>
+                            <p th:text="${u.idade + ' anos'}"></p>
+                        </div>
+                        <div style="color:var(--text-muted); font-size:0.8rem" th:text="${'ID: ' + u.id}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
