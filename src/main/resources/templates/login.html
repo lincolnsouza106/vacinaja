@@ -23,29 +23,32 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="card">
-            <div class="logo" style="display:block; text-align:center; margin-bottom:1rem;">VacinaJá Admin</div>
-            <div th:if="${param.error}" class="error">
-                Usuário ou senha inválidos.
+    <div id="app" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        <div class="card" style="max-width: 400px; width: 100%;">
+            <div class="logo" style="display:flex; justify-content:center; align-items:center; margin-bottom:2rem; font-size:1.5rem; font-weight:700; color:var(--primary);">
+                💉 VacinaBrasil
             </div>
-            <div th:if="${param.logout}" style="color:#10b981; margin-bottom:1rem; text-align:center;">
-                Deslogado com sucesso.
+            
+            <div th:if="${param.error}" style="color: var(--danger); text-align: center; margin-bottom: 1rem; font-weight: 600; padding: 0.5rem; background: #fee2e2; border-radius: 4px;">
+                Credenciais inválidas.
+            </div>
+            <div th:if="${param.logout}" style="color: var(--success); text-align: center; margin-bottom: 1rem; font-weight: 600; padding: 0.5rem; background: #d1fae5; border-radius: 4px;">
+                Você saiu com sucesso.
             </div>
             
             <form th:action="@{/login}" method="post">
                 <div class="form-group">
-                    <label>Usuário:</label>
-                    <input type="text" name="username" class="form-control" placeholder="admin" required autofocus>
+                    <label for="username">Usuário Gov.br</label>
+                    <input type="text" id="username" name="username" class="form-control" required autofocus />
                 </div>
                 <div class="form-group">
-                    <label>Senha:</label>
-                    <input type="password" name="password" class="form-control" placeholder="admin" required>
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" class="form-control" required />
                 </div>
-                <button type="submit" class="btn">Entrar</button>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Entrar</button>
             </form>
-            <div style="margin-top: 1rem; text-align:center;">
-                <a th:href="@{/}" style="color:var(--text-muted); text-decoration:none;">&larr; Voltar ao site</a>
+            <div style="margin-top: 1.5rem; text-align:center;">
+                <a th:href="@{/}" style="color:var(--primary); text-decoration:underline; font-size: 0.9rem;">Voltar ao portal</a>
             </div>
         </div>
     </div>
