@@ -1,6 +1,7 @@
 package br.com.vacinaja.controller;
 
 import br.com.vacinaja.dto.UsuarioDTO;
+import br.com.vacinaja.model.Agendamento;
 import br.com.vacinaja.model.Campanha;
 import br.com.vacinaja.model.PostoSaude;
 import br.com.vacinaja.model.RegistroVacinacao;
@@ -29,8 +30,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class MvcController {
@@ -62,12 +67,17 @@ public class MvcController {
     }
 
     @GetMapping("/")
-    public String vacinas(Model model, @RequestParam(required = false) Integer idade) {
+    public String vacinas(Model model, @RequestParam(required = false) Integer idade, Authentication authentication) {
         model.addAttribute("view", "vacinas");
         model.addAttribute("idade", idade);
-        if (idade != null) {
-            model.addAttribute("vacinas", vacinaService.consultarPorIdade(idade));
-        }
+        preencherCarteira(model, authentication);
+        return "index";
+    }
+
+    @GetMapping("/carteira")
+    public String carteira(Model model, Authentication authentication) {
+        model.addAttribute("view", "carteira");
+        preencherCarteira(model, authentication);
         return "index";
     }
 
@@ -303,5 +313,56 @@ public class MvcController {
     private boolean isAdmin(Authentication authentication) {
         return authentication != null && authentication.getAuthorities().stream()
             .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+    }
+
+    private void preencherCarteira(Model model, Authentication authentication) {
+        Usuario usuario = usuarioService.buscarPorEmail(authentication.getName());
+        List<RegistroVacinacao> registros = usuario.getListaRegistroVacinacao();
+        List<Vacina> todasVacinas = vacinaService.listarVacinas();
+        List<Vacina> pendentes = usuarioService.verificarPendencias(usuario.getId());
+        List<Agendamento> agendamentos = agendamentoService.listarPorUsuario(usuario);
+
+        Set<Long> vacinasAplicadasUnicas = new HashSet<>();
+        for (RegistroVacinacao registro : registros) {
+            if (registro.getVacina() != null && registro.getVacina().getId() != null) {
+                vacinasAplicadasUnicas.add(registro.getVacina().getId());
+            }
+        }
+
+        int totalVacinas = todasVacinas.size();
+        int vacinasAplicadas = vacinasAplicadasUnicas.size();
+        int coberturaVacinal = totalVacinas == 0 ? 0 : Math.round((vacinasAplicadas * 100f) / totalVacinas);
+        int coberturaBucket = Math.min(100, Math.max(0, Math.round(coberturaVacinal / 10f) * 10));
+
+        Optional<Agendamento> proximoAgendamento = agendamentos.stream()
+            .filter(agendamento -> !"CANCELADO".equals(agendamento.getStatus()))
+            .filter(agendamento -> !agendamento.getData().isBefore(LocalDate.now()))
+            .min(Comparator.comparing(Agendamento::getData).thenComparing(Agendamento::getHorario));
+
+        String proximaDoseValor = "Em dia";
+        String proximaDoseDescricao = "Nenhuma dose pendente";
+        if (proximoAgendamento.isPresent()) {
+            Agendamento agendamento = proximoAgendamento.get();
+            proximaDoseValor = agendamento.getData().toString();
+            proximaDoseDescricao = agendamento.getVacina().getNome() + " as " + agendamento.getHorario();
+        } else if (!pendentes.isEmpty()) {
+            proximaDoseValor = "Pendente";
+            proximaDoseDescricao = pendentes.get(0).getNome();
+        }
+
+        model.addAttribute("usuarioAtual", usuario);
+        model.addAttribute("vacinas", todasVacinas);
+        model.addAttribute("meusRegistros", registros);
+        model.addAttribute("pendentes", pendentes);
+        model.addAttribute("pendenciasCount", pendentes.size());
+        model.addAttribute("meusAgendamentos", agendamentos);
+        model.addAttribute("vacinasAplicadas", vacinasAplicadas);
+        model.addAttribute("dosesRegistradas", registros.size());
+        model.addAttribute("totalVacinas", totalVacinas);
+        model.addAttribute("campanhasAtivas", campanhaService.listarCampanhas().size());
+        model.addAttribute("coberturaVacinal", coberturaVacinal);
+        model.addAttribute("coberturaClass", "progress-fill progress-fill--" + coberturaBucket);
+        model.addAttribute("proximaDoseValor", proximaDoseValor);
+        model.addAttribute("proximaDoseDescricao", proximaDoseDescricao);
     }
 }

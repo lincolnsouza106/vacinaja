@@ -10,7 +10,7 @@
     <title>VacinaJá - Sistema Nacional</title>
 </head>
 <body>
-    <div class="app-shell" th:with="pageLabel=${view == 'vacinas' ? 'Início' : (view == 'postos' ? 'Postos de Vacinação' : (view == 'campanhas' ? 'Campanhas' : (view == 'registrar' ? 'Carteira Digital' : (view == 'agendamentos' ? 'Agendamentos' : (view == 'pendencias' ? 'Pendências' : 'Gerenciar Usuários')))))}">
+    <div class="app-shell" th:with="pageLabel=${view == 'vacinas' ? 'Início' : (view == 'carteira' ? 'Carteira de Vacinação' : (view == 'postos' ? 'Postos de Vacinação' : (view == 'campanhas' ? 'Campanhas' : (view == 'registrar' ? 'Registrar Dose' : (view == 'agendamentos' ? 'Agendamentos' : (view == 'pendencias' ? 'Pendências' : 'Gerenciar Usuários'))))))}">
         <nav class="topbar" aria-label="Navegação principal">
             <a th:href="@{/}" class="brand">
                 <span class="brand-mark">VJ</span>
@@ -22,9 +22,10 @@
 
             <ul class="nav-links">
                 <li><a th:href="@{/}" th:class="${view == 'vacinas'} ? 'nav-item active' : 'nav-item'">Início</a></li>
+                <li><a th:href="@{/carteira}" th:class="${view == 'carteira'} ? 'nav-item active' : 'nav-item'">Carteira</a></li>
                 <li><a th:href="@{/postos}" th:class="${view == 'postos'} ? 'nav-item active' : 'nav-item'">Postos</a></li>
                 <li><a th:href="@{/campanhas}" th:class="${view == 'campanhas'} ? 'nav-item active' : 'nav-item'">Campanhas</a></li>
-                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/registrar}" th:class="${view == 'registrar'} ? 'nav-item active' : 'nav-item'">Carteira Digital</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/registrar}" th:class="${view == 'registrar'} ? 'nav-item active' : 'nav-item'">Registrar Dose</a></li>
                 <li><a th:href="@{/agendamentos}" th:class="${view == 'agendamentos'} ? 'nav-item active' : 'nav-item'">Agendamentos</a></li>
                 <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/usuarios}" th:class="${view == 'usuarios'} ? 'nav-item active' : 'nav-item'">Usuários</a></li>
             </ul>
@@ -52,12 +53,15 @@
 
         <main class="content-wrapper">
             <div sec:authorize="isAuthenticated()" th:if="${view == 'vacinas'}" class="notice">
-                <p><strong>Alerta:</strong> Dose pendente de COVID-19 agendada para 14 de fevereiro de 2026.</p>
-                <a th:href="@{/pendencias}" class="btn btn--light">Ver detalhes</a>
+                <p><strong>Carteira:</strong> <span th:text="${proximaDoseValor + ' - ' + proximaDoseDescricao}">Acompanhe sua situação vacinal</span></p>
+                <a th:href="@{/carteira}" class="btn btn--light">Ver carteira</a>
             </div>
 
             <div th:if="${view == 'vacinas'}">
                 <div th:replace="~{fragments :: vacinas}"></div>
+            </div>
+            <div th:if="${view == 'carteira'}">
+                <div th:replace="~{fragments :: carteira}"></div>
             </div>
             <div th:if="${view == 'postos'}">
                 <div th:replace="~{fragments :: postos}"></div>
