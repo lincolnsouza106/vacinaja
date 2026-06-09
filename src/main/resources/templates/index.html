@@ -10,7 +10,7 @@
     <title>VacinaJá - Sistema Nacional</title>
 </head>
 <body>
-    <div class="app-shell" th:with="pageLabel=${view == 'vacinas' ? 'Início' : (view == 'carteira' ? 'Carteira de Vacinação' : (view == 'postos' ? 'Postos de Vacinação' : (view == 'campanhas' ? 'Campanhas' : (view == 'registrar' ? 'Registrar Dose' : (view == 'agendamentos' ? 'Agendamentos' : (view == 'pendencias' ? 'Pendências' : 'Gerenciar Usuários'))))))}">
+    <div class="app-shell" th:with="pageLabel=${view == 'vacinas' ? 'Início' : (view == 'carteira' ? 'Carteira de Vacinação' : (view == 'postos' ? 'Postos de Vacinação' : (view == 'campanhas' ? 'Campanhas' : (view == 'gerenciarVacinas' ? 'Gerenciar Vacinas' : (view == 'registrar' ? 'Registrar Dose' : (view == 'agendamentos' ? 'Agendamentos' : (view == 'pendencias' ? 'Pendências' : 'Gerenciar Usuários')))))))}">
         <nav class="topbar" aria-label="Navegação principal">
             <a th:href="@{/}" class="brand">
                 <span class="brand-mark">VJ</span>
@@ -25,6 +25,7 @@
                 <li><a th:href="@{/carteira}" th:class="${view == 'carteira'} ? 'nav-item active' : 'nav-item'">Carteira</a></li>
                 <li><a th:href="@{/postos}" th:class="${view == 'postos'} ? 'nav-item active' : 'nav-item'">Postos</a></li>
                 <li><a th:href="@{/campanhas}" th:class="${view == 'campanhas'} ? 'nav-item active' : 'nav-item'">Campanhas</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/vacinas}" th:class="${view == 'gerenciarVacinas'} ? 'nav-item active' : 'nav-item'">Vacinas</a></li>
                 <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/registrar}" th:class="${view == 'registrar'} ? 'nav-item active' : 'nav-item'">Registrar Dose</a></li>
                 <li><a th:href="@{/agendamentos}" th:class="${view == 'agendamentos'} ? 'nav-item active' : 'nav-item'">Agendamentos</a></li>
                 <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/usuarios}" th:class="${view == 'usuarios'} ? 'nav-item active' : 'nav-item'">Usuários</a></li>
@@ -80,6 +81,9 @@
             </div>
             <div th:if="${view == 'campanhas'}">
                 <div th:replace="~{fragments :: campanhas}"></div>
+            </div>
+            <div th:if="${view == 'gerenciarVacinas'}">
+                <div th:replace="~{fragments :: gerenciarVacinas}"></div>
             </div>
         </main>
     </div>

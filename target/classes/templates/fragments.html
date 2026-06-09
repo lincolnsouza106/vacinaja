@@ -269,11 +269,17 @@
                             <label for="postoTelefone">Telefone</label>
                             <input type="text" id="postoTelefone" name="telefone" class="form-control" required>
                         </div>
-                        <div class="form-group">
-                            <label for="postoVacinas">Vacinas disponíveis</label>
-                            <select id="postoVacinas" name="vacinaIds" class="form-control" multiple>
-                                <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
-                            </select>
+                        <div class="form-group form-group--full">
+                            <label>Vacinas disponiveis</label>
+                            <div class="checkbox-grid">
+                                <label th:each="v : ${vacinas}" class="checkbox-card">
+                                    <input type="checkbox" name="vacinaIds" th:value="${v.id}">
+                                    <span>
+                                        <strong th:text="${v.nome}">Vacina</strong>
+                                        <small th:text="${v.doencaPrevenida}">Doenca prevenida</small>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-actions">
@@ -334,11 +340,17 @@
                                     <label th:for="${'postoTelefone' + p.id}">Telefone</label>
                                     <input type="text" th:id="${'postoTelefone' + p.id}" name="telefone" class="form-control" th:value="${p.telefone}" required>
                                 </div>
-                                <div class="form-group">
-                                    <label th:for="${'postoVacinas' + p.id}">Vacinas</label>
-                                    <select th:id="${'postoVacinas' + p.id}" name="vacinaIds" class="form-control" multiple>
-                                        <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}" th:selected="${p.possuiVacina(v.id)}"></option>
-                                    </select>
+                                <div class="form-group form-group--full">
+                                    <label>Vacinas disponiveis</label>
+                                    <div class="checkbox-grid">
+                                        <label th:each="v : ${vacinas}" class="checkbox-card">
+                                            <input type="checkbox" name="vacinaIds" th:value="${v.id}" th:checked="${p.possuiVacina(v.id)}">
+                                            <span>
+                                                <strong th:text="${v.nome}">Vacina</strong>
+                                                <small th:text="${v.doencaPrevenida}">Doenca prevenida</small>
+                                            </span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-actions">
@@ -683,6 +695,157 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <div th:fragment="gerenciarVacinas">
+        <div class="section-header">
+            <div>
+                <div class="section-eyebrow">Administracao</div>
+                <h1 class="section-title">Gerenciar Vacinas</h1>
+                <p class="section-description">Cadastre vacinas, mantenha informacoes tecnicas atualizadas e controle quais imunizantes ficam disponiveis nos postos.</p>
+            </div>
+            <button type="button" class="btn" data-modal-open="modal-nova-vacina">Nova vacina</button>
+        </div>
+
+        <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
+        <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
+
+        <dialog id="modal-nova-vacina" class="modal">
+            <form th:action="@{/admin/vacinas}" method="post" class="modal-panel">
+                <div class="modal-header">
+                    <div>
+                        <h3 class="card-title">Nova vacina</h3>
+                        <p class="card-meta">Informe publico, doses e intervalo recomendado.</p>
+                    </div>
+                    <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                        <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                    </button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="vacinaNome">Nome</label>
+                        <input type="text" id="vacinaNome" name="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vacinaDoenca">Doenca prevenida</label>
+                        <input type="text" id="vacinaDoenca" name="doencaPrevenida" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vacinaIdadeMinima">Idade minima</label>
+                        <input type="number" id="vacinaIdadeMinima" name="idadeMinima" class="form-control" min="0" max="130" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vacinaIdadeMaxima">Idade maxima</label>
+                        <input type="number" id="vacinaIdadeMaxima" name="idadeMaxima" class="form-control" min="0" max="130" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vacinaDoses">Doses necessarias</label>
+                        <input type="number" id="vacinaDoses" name="dosesNecessarias" class="form-control" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vacinaIntervalo">Intervalo entre doses (dias)</label>
+                        <input type="number" id="vacinaIntervalo" name="intervaloDoses" class="form-control" min="0" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                    <button type="submit" class="btn">Salvar vacina</button>
+                </div>
+            </form>
+        </dialog>
+
+        <div th:if="${vacinas == null or vacinas.isEmpty()}" class="empty-state">
+            Nenhuma vacina cadastrada.
+        </div>
+
+        <div class="result-grid">
+            <div th:each="v : ${vacinas}" class="card edit-card">
+                <div class="resource-row">
+                    <div>
+                        <h3 class="card-title" th:text="${v.nome}">Vacina</h3>
+                        <p>Previne: <strong th:text="${v.doencaPrevenida}">Doenca</strong></p>
+                        <p class="card-meta">
+                            <span th:text="${v.idadeMinima + ' a ' + v.idadeMaxima + ' anos'}">0 a 100 anos</span>
+                            <span> - </span>
+                            <span th:text="${v.dosesNecessarias + ' dose(s)'}">1 dose</span>
+                            <span> - intervalo: </span>
+                            <span th:text="${v.intervaloDoses + ' dias'}">0 dias</span>
+                        </p>
+                    </div>
+                    <div class="icon-actions">
+                        <button type="button" class="icon-button" th:attr="data-modal-open=${'modal-editar-vacina-' + v.id}" aria-label="Editar vacina">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M4.75 19.25h4l9.5-9.5a2.12 2.12 0 0 0-3-3l-9.5 9.5-1 3Z"></path><path d="m13.75 8.25 3 3"></path></svg>
+                        </button>
+                        <button type="button" class="icon-button icon-button--danger" th:attr="data-modal-open=${'modal-excluir-vacina-' + v.id}" aria-label="Excluir vacina">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M5 7h14"></path><path d="M9 7V5.75A1.75 1.75 0 0 1 10.75 4h2.5A1.75 1.75 0 0 1 15 5.75V7"></path><path d="M17.5 7l-.7 11.1a2 2 0 0 1-2 1.9H9.2a2 2 0 0 1-2-1.9L6.5 7"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <dialog th:id="${'modal-editar-vacina-' + v.id}" class="modal">
+                    <form th:action="@{/admin/vacinas}" method="post" class="modal-panel">
+                        <input type="hidden" name="id" th:value="${v.id}">
+                        <div class="modal-header">
+                            <div>
+                                <h3 class="card-title" th:text="${'Editar ' + v.nome}">Editar vacina</h3>
+                                <p class="card-meta">Atualize as informacoes da vacina.</p>
+                            </div>
+                            <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                            </button>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label th:for="${'vacinaNome' + v.id}">Nome</label>
+                                <input type="text" th:id="${'vacinaNome' + v.id}" name="nome" class="form-control" th:value="${v.nome}" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="${'vacinaDoenca' + v.id}">Doenca prevenida</label>
+                                <input type="text" th:id="${'vacinaDoenca' + v.id}" name="doencaPrevenida" class="form-control" th:value="${v.doencaPrevenida}" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="${'vacinaIdadeMinima' + v.id}">Idade minima</label>
+                                <input type="number" th:id="${'vacinaIdadeMinima' + v.id}" name="idadeMinima" class="form-control" min="0" max="130" th:value="${v.idadeMinima}" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="${'vacinaIdadeMaxima' + v.id}">Idade maxima</label>
+                                <input type="number" th:id="${'vacinaIdadeMaxima' + v.id}" name="idadeMaxima" class="form-control" min="0" max="130" th:value="${v.idadeMaxima}" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="${'vacinaDoses' + v.id}">Doses necessarias</label>
+                                <input type="number" th:id="${'vacinaDoses' + v.id}" name="dosesNecessarias" class="form-control" min="1" th:value="${v.dosesNecessarias}" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="${'vacinaIntervalo' + v.id}">Intervalo entre doses (dias)</label>
+                                <input type="number" th:id="${'vacinaIntervalo' + v.id}" name="intervaloDoses" class="form-control" min="0" th:value="${v.intervaloDoses}" required>
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                            <button type="submit" class="btn">Salvar alteracoes</button>
+                        </div>
+                    </form>
+                </dialog>
+
+                <dialog th:id="${'modal-excluir-vacina-' + v.id}" class="modal modal--sm">
+                    <form th:action="@{/admin/vacinas/{id}/excluir(id=${v.id})}" method="post" class="modal-panel">
+                        <div class="modal-header">
+                            <div>
+                                <h3 class="card-title">Excluir vacina</h3>
+                                <p class="card-meta" th:text="${'Confirmar exclusao de ' + v.nome + '?'}"></p>
+                            </div>
+                            <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                            </button>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                            <button type="submit" class="btn btn--danger">Excluir</button>
+                        </div>
+                    </form>
+                </dialog>
+            </div>
+        </div>
     </div>
 
     <div th:fragment="usuarios">

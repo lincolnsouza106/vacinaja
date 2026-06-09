@@ -127,6 +127,45 @@ public class MvcController {
         return "redirect:/postos";
     }
 
+    @GetMapping("/admin/vacinas")
+    public String gerenciarVacinas(Model model) {
+        model.addAttribute("view", "gerenciarVacinas");
+        model.addAttribute("vacinas", vacinaService.listarVacinas());
+        return "index";
+    }
+
+    @PostMapping("/admin/vacinas")
+    public String salvarVacina(@RequestParam(required = false) Long id,
+                               @RequestParam String nome,
+                               @RequestParam String doencaPrevenida,
+                               @RequestParam int idadeMinima,
+                               @RequestParam int idadeMaxima,
+                               @RequestParam int dosesNecessarias,
+                               @RequestParam int intervaloDoses,
+                               RedirectAttributes redirectAttributes) {
+        Vacina vacina = id != null ? vacinaService.buscarPorId(id) : new Vacina();
+        vacina.setNome(nome);
+        vacina.setDoencaPrevenida(doencaPrevenida);
+        vacina.setIdadeMinima(idadeMinima);
+        vacina.setIdadeMaxima(idadeMaxima);
+        vacina.setDosesNecessarias(dosesNecessarias);
+        vacina.setIntervaloDoses(intervaloDoses);
+        vacinaService.cadastrarVacina(vacina);
+        redirectAttributes.addFlashAttribute("mensagem", "Vacina salva com sucesso!");
+        return "redirect:/admin/vacinas";
+    }
+
+    @PostMapping("/admin/vacinas/{id}/excluir")
+    public String excluirVacina(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            vacinaService.excluirVacina(id);
+            redirectAttributes.addFlashAttribute("mensagem", "Vacina excluida com sucesso!");
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("erroValidacao", "Esta vacina possui vinculos com postos, registros ou agendamentos e nao pode ser excluida.");
+        }
+        return "redirect:/admin/vacinas";
+    }
+
     @GetMapping("/registrar")
     public String registrar(Model model) {
         model.addAttribute("view", "registrar");

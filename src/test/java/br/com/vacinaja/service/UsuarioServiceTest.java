@@ -1,6 +1,7 @@
 package br.com.vacinaja.service;
 
 import br.com.vacinaja.model.Usuario;
+import br.com.vacinaja.model.Vacina;
 import br.com.vacinaja.repository.RegistroVacinacaoRepository;
 import br.com.vacinaja.repository.UsuarioRepository;
 import br.com.vacinaja.repository.VacinaRepository;
@@ -10,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,5 +59,23 @@ public class UsuarioServiceTest {
 
         assertNotNull(encontrado);
         assertEquals("Ana", encontrado.getNome());
+    }
+
+    @Test
+    void verificarPendencias_DeveConsiderarApenasVacinasDaFaixaEtariaDoUsuario() {
+        Usuario usuario = new Usuario("Pedro", 30);
+        usuario.setId(1L);
+        Vacina indicada = new Vacina("Gripe", "Influenza", 18, 59, 1, 365);
+        indicada.setId(10L);
+        Vacina foraDaIdade = new Vacina("Pneumo Senior", "Pneumonia", 60, 130, 1, 0);
+        foraDaIdade.setId(20L);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(vacinaRepository.findAll()).thenReturn(List.of(indicada, foraDaIdade));
+
+        List<Vacina> pendentes = usuarioService.verificarPendencias(1L);
+
+        assertEquals(1, pendentes.size());
+        assertEquals("Gripe", pendentes.get(0).getNome());
     }
 }

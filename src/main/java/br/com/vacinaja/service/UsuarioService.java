@@ -55,6 +55,7 @@ public class UsuarioService {
 
         List<Vacina> todasVacinas = vacinaRepository.findAll();
         return todasVacinas.stream()
+            .filter(v -> usuario.getIdade() >= v.getIdadeMinima() && usuario.getIdade() <= v.getIdadeMaxima())
             .filter(v -> !vacinasTomadas.contains(v.getId()))
             .collect(Collectors.toList());
     }
