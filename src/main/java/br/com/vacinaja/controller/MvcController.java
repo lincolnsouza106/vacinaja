@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -102,6 +103,17 @@ public class MvcController {
         posto.setVacinasDisponiveis(buscarVacinas(vacinaIds));
         postoService.cadastrarPosto(posto);
         redirectAttributes.addFlashAttribute("mensagem", "Posto salvo com sucesso!");
+        return "redirect:/postos";
+    }
+
+    @PostMapping("/admin/postos/{id}/excluir")
+    public String excluirPosto(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            postoService.excluirPosto(id);
+            redirectAttributes.addFlashAttribute("mensagem", "Posto excluido com sucesso!");
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("erroValidacao", "Este posto possui registros vinculados e nao pode ser excluido.");
+        }
         return "redirect:/postos";
     }
 
@@ -235,6 +247,17 @@ public class MvcController {
         campanha.setPublicoAlvo(publicoAlvo);
         campanhaService.cadastrarCampanha(campanha);
         redirectAttributes.addFlashAttribute("mensagem", "Campanha salva com sucesso!");
+        return "redirect:/campanhas";
+    }
+
+    @PostMapping("/admin/campanhas/{id}/excluir")
+    public String excluirCampanha(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            campanhaService.excluirCampanha(id);
+            redirectAttributes.addFlashAttribute("mensagem", "Campanha excluida com sucesso!");
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("erroValidacao", "Esta campanha possui vinculos e nao pode ser excluida.");
+        }
         return "redirect:/campanhas";
     }
 

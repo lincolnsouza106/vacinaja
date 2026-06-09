@@ -9,7 +9,7 @@
                 <h1 class="section-title">Painel de Vacinação</h1>
                 <p class="section-description">Acompanhe sua situação vacinal, campanhas ativas e próximos passos da carteira digital.</p>
             </div>
-            <a th:href="@{/pendencias}" class="btn btn--secondary">Agendar Vacina</a>
+            <a th:href="@{/agendamentos}" class="btn btn--secondary">Agendar Vacina</a>
         </div>
 
         <div class="kpi-grid">
@@ -159,82 +159,141 @@
             <div class="section-header section-header--compact">
                 <div>
                     <div class="section-eyebrow">Administração</div>
-                    <h2 class="section-title section-title--sm">Cadastro e edição de postos</h2>
-                    <p class="section-description">Atualize dados operacionais e vacinas disponíveis por unidade.</p>
+                    <h2 class="section-title section-title--sm">Postos cadastrados</h2>
+                    <p class="section-description">Crie, edite e remova unidades de atendimento.</p>
                 </div>
+                <button type="button" class="btn" data-modal-open="modal-novo-posto">Novo posto</button>
             </div>
 
-            <form th:action="@{/admin/postos}" method="post" class="form-panel">
-                <h3 class="card-title">Novo posto</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="postoNome">Nome</label>
-                        <input type="text" id="postoNome" name="nome" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="postoRegiao">Região</label>
-                        <input type="text" id="postoRegiao" name="regiao" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="postoEndereco">Endereço</label>
-                        <input type="text" id="postoEndereco" name="endereco" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="postoHorario">Horário</label>
-                        <input type="text" id="postoHorario" name="horarioFuncionamento" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="postoTelefone">Telefone</label>
-                        <input type="text" id="postoTelefone" name="telefone" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="postoVacinas">Vacinas disponíveis</label>
-                        <select id="postoVacinas" name="vacinaIds" class="form-control" multiple>
-                            <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn">Salvar posto</button>
-                </div>
-            </form>
-
-            <div class="result-grid">
-                <form th:each="p : ${todosPostos}" th:action="@{/admin/postos}" method="post" class="card edit-card">
-                    <input type="hidden" name="id" th:value="${p.id}">
-                    <h3 class="card-title" th:text="${p.nome}">Posto</h3>
-                    <div class="form-group">
-                        <label th:for="${'postoNome' + p.id}">Nome</label>
-                        <input type="text" th:id="${'postoNome' + p.id}" name="nome" class="form-control" th:value="${p.nome}" required>
+            <dialog id="modal-novo-posto" class="modal">
+                <form th:action="@{/admin/postos}" method="post" class="modal-panel">
+                    <div class="modal-header">
+                        <div>
+                            <h3 class="card-title">Novo posto</h3>
+                            <p class="card-meta">Cadastre uma unidade de atendimento.</p>
+                        </div>
+                        <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                        </button>
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label th:for="${'postoRegiao' + p.id}">Região</label>
-                            <input type="text" th:id="${'postoRegiao' + p.id}" name="regiao" class="form-control" th:value="${p.regiao}" required>
+                            <label for="postoNome">Nome</label>
+                            <input type="text" id="postoNome" name="nome" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label th:for="${'postoTelefone' + p.id}">Telefone</label>
-                            <input type="text" th:id="${'postoTelefone' + p.id}" name="telefone" class="form-control" th:value="${p.telefone}" required>
+                            <label for="postoRegiao">Região</label>
+                            <input type="text" id="postoRegiao" name="regiao" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postoEndereco">Endereço</label>
+                            <input type="text" id="postoEndereco" name="endereco" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postoHorario">Horário</label>
+                            <input type="text" id="postoHorario" name="horarioFuncionamento" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postoTelefone">Telefone</label>
+                            <input type="text" id="postoTelefone" name="telefone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postoVacinas">Vacinas disponíveis</label>
+                            <select id="postoVacinas" name="vacinaIds" class="form-control" multiple>
+                                <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
+                            </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label th:for="${'postoEndereco' + p.id}">Endereço</label>
-                        <input type="text" th:id="${'postoEndereco' + p.id}" name="endereco" class="form-control" th:value="${p.endereco}" required>
-                    </div>
-                    <div class="form-group">
-                        <label th:for="${'postoHorario' + p.id}">Horário</label>
-                        <input type="text" th:id="${'postoHorario' + p.id}" name="horarioFuncionamento" class="form-control" th:value="${p.horarioFuncionamento}" required>
-                    </div>
-                    <div class="form-group">
-                        <label th:for="${'postoVacinas' + p.id}">Vacinas</label>
-                        <select th:id="${'postoVacinas' + p.id}" name="vacinaIds" class="form-control" multiple>
-                            <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}" th:selected="${p.possuiVacina(v.id)}"></option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn--light">Atualizar posto</button>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                        <button type="submit" class="btn">Salvar posto</button>
                     </div>
                 </form>
+            </dialog>
+
+            <div class="result-grid">
+                <div th:each="p : ${todosPostos}" class="card edit-card">
+                    <div class="resource-row">
+                        <div>
+                            <h3 class="card-title" th:text="${p.nome}">Posto</h3>
+                            <p th:text="${p.endereco}"></p>
+                            <p class="card-meta" th:text="${p.regiao + ' - ' + p.horarioFuncionamento}"></p>
+                        </div>
+                        <div class="icon-actions">
+                            <button type="button" class="icon-button" th:attr="data-modal-open=${'modal-editar-posto-' + p.id}" aria-label="Editar posto">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M4.75 19.25h4l9.5-9.5a2.12 2.12 0 0 0-3-3l-9.5 9.5-1 3Z"></path><path d="m13.75 8.25 3 3"></path></svg>
+                            </button>
+                            <button type="button" class="icon-button icon-button--danger" th:attr="data-modal-open=${'modal-excluir-posto-' + p.id}" aria-label="Excluir posto">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M5 7h14"></path><path d="M9 7V5.75A1.75 1.75 0 0 1 10.75 4h2.5A1.75 1.75 0 0 1 15 5.75V7"></path><path d="M17.5 7l-.7 11.1a2 2 0 0 1-2 1.9H9.2a2 2 0 0 1-2-1.9L6.5 7"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <dialog th:id="${'modal-editar-posto-' + p.id}" class="modal">
+                        <form th:action="@{/admin/postos}" method="post" class="modal-panel">
+                            <input type="hidden" name="id" th:value="${p.id}">
+                            <div class="modal-header">
+                                <div>
+                                    <h3 class="card-title" th:text="${'Editar ' + p.nome}">Editar posto</h3>
+                                    <p class="card-meta">Atualize dados e vacinas disponíveis.</p>
+                                </div>
+                                <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                                    <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                                </button>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label th:for="${'postoNome' + p.id}">Nome</label>
+                                    <input type="text" th:id="${'postoNome' + p.id}" name="nome" class="form-control" th:value="${p.nome}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'postoRegiao' + p.id}">Região</label>
+                                    <input type="text" th:id="${'postoRegiao' + p.id}" name="regiao" class="form-control" th:value="${p.regiao}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'postoEndereco' + p.id}">Endereço</label>
+                                    <input type="text" th:id="${'postoEndereco' + p.id}" name="endereco" class="form-control" th:value="${p.endereco}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'postoHorario' + p.id}">Horário</label>
+                                    <input type="text" th:id="${'postoHorario' + p.id}" name="horarioFuncionamento" class="form-control" th:value="${p.horarioFuncionamento}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'postoTelefone' + p.id}">Telefone</label>
+                                    <input type="text" th:id="${'postoTelefone' + p.id}" name="telefone" class="form-control" th:value="${p.telefone}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'postoVacinas' + p.id}">Vacinas</label>
+                                    <select th:id="${'postoVacinas' + p.id}" name="vacinaIds" class="form-control" multiple>
+                                        <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}" th:selected="${p.possuiVacina(v.id)}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                                <button type="submit" class="btn">Salvar alterações</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <dialog th:id="${'modal-excluir-posto-' + p.id}" class="modal modal--sm">
+                        <form th:action="@{/admin/postos/{id}/excluir(id=${p.id})}" method="post" class="modal-panel">
+                            <div class="modal-header">
+                                <div>
+                                    <h3 class="card-title">Excluir posto</h3>
+                                    <p class="card-meta" th:text="${'Confirmar exclusão de ' + p.nome + '?'}"></p>
+                                </div>
+                                <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                                    <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                                </button>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                                <button type="submit" class="btn btn--danger">Excluir</button>
+                            </div>
+                        </form>
+                    </dialog>
+                </div>
             </div>
         </section>
     </div>
@@ -427,70 +486,129 @@
             <div class="section-header section-header--compact">
                 <div>
                     <div class="section-eyebrow">Administração</div>
-                    <h2 class="section-title section-title--sm">Cadastro e edição de campanhas</h2>
-                    <p class="section-description">Gerencie períodos, públicos prioritários e mensagens da campanha.</p>
+                    <h2 class="section-title section-title--sm">Campanhas cadastradas</h2>
+                    <p class="section-description">Crie, edite e remova campanhas de vacinação.</p>
                 </div>
+                <button type="button" class="btn" data-modal-open="modal-nova-campanha">Nova campanha</button>
             </div>
 
-            <form th:action="@{/admin/campanhas}" method="post" class="form-panel">
-                <h3 class="card-title">Nova campanha</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="campanhaNome">Nome</label>
-                        <input type="text" id="campanhaNome" name="nome" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="campanhaPublico">Público-alvo</label>
-                        <input type="text" id="campanhaPublico" name="publicoAlvo" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="campanhaInicio">Início</label>
-                        <input type="date" id="campanhaInicio" name="dataInicio" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="campanhaFim">Fim</label>
-                        <input type="date" id="campanhaFim" name="dataFim" class="form-control" required>
-                    </div>
-                    <div class="form-group form-group--full">
-                        <label for="campanhaDescricao">Descrição</label>
-                        <input type="text" id="campanhaDescricao" name="descricao" class="form-control" required>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn">Salvar campanha</button>
-                </div>
-            </form>
-
-            <div class="result-grid">
-                <form th:each="c : ${campanhas}" th:action="@{/admin/campanhas}" method="post" class="card edit-card">
-                    <input type="hidden" name="id" th:value="${c.id}">
-                    <h3 class="card-title" th:text="${c.nome}">Campanha</h3>
-                    <div class="form-group">
-                        <label th:for="${'campanhaNome' + c.id}">Nome</label>
-                        <input type="text" th:id="${'campanhaNome' + c.id}" name="nome" class="form-control" th:value="${c.nome}" required>
-                    </div>
-                    <div class="form-group">
-                        <label th:for="${'campanhaDescricao' + c.id}">Descrição</label>
-                        <input type="text" th:id="${'campanhaDescricao' + c.id}" name="descricao" class="form-control" th:value="${c.descricao}" required>
+            <dialog id="modal-nova-campanha" class="modal">
+                <form th:action="@{/admin/campanhas}" method="post" class="modal-panel">
+                    <div class="modal-header">
+                        <div>
+                            <h3 class="card-title">Nova campanha</h3>
+                            <p class="card-meta">Defina período, público-alvo e mensagem.</p>
+                        </div>
+                        <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                        </button>
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label th:for="${'campanhaInicio' + c.id}">Início</label>
-                            <input type="date" th:id="${'campanhaInicio' + c.id}" name="dataInicio" class="form-control" th:value="${#dates.format(c.dataInicio, 'yyyy-MM-dd')}" required>
+                            <label for="campanhaNome">Nome</label>
+                            <input type="text" id="campanhaNome" name="nome" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label th:for="${'campanhaFim' + c.id}">Fim</label>
-                            <input type="date" th:id="${'campanhaFim' + c.id}" name="dataFim" class="form-control" th:value="${#dates.format(c.dataFim, 'yyyy-MM-dd')}" required>
+                            <label for="campanhaPublico">Público-alvo</label>
+                            <input type="text" id="campanhaPublico" name="publicoAlvo" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="campanhaInicio">Início</label>
+                            <input type="date" id="campanhaInicio" name="dataInicio" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="campanhaFim">Fim</label>
+                            <input type="date" id="campanhaFim" name="dataFim" class="form-control" required>
+                        </div>
+                        <div class="form-group form-group--full">
+                            <label for="campanhaDescricao">Descrição</label>
+                            <input type="text" id="campanhaDescricao" name="descricao" class="form-control" required>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label th:for="${'campanhaPublico' + c.id}">Público-alvo</label>
-                        <input type="text" th:id="${'campanhaPublico' + c.id}" name="publicoAlvo" class="form-control" th:value="${c.publicoAlvo}" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn--light">Atualizar campanha</button>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                        <button type="submit" class="btn">Salvar campanha</button>
                     </div>
                 </form>
+            </dialog>
+
+            <div class="result-grid">
+                <div th:each="c : ${campanhas}" class="card edit-card">
+                    <div class="resource-row">
+                        <div>
+                            <h3 class="card-title" th:text="${c.nome}">Campanha</h3>
+                            <p th:text="${c.descricao}"></p>
+                            <p class="card-meta"><span th:text="${#dates.format(c.dataInicio, 'dd/MM/yyyy')}"></span> a <span th:text="${#dates.format(c.dataFim, 'dd/MM/yyyy')}"></span></p>
+                        </div>
+                        <div class="icon-actions">
+                            <button type="button" class="icon-button" th:attr="data-modal-open=${'modal-editar-campanha-' + c.id}" aria-label="Editar campanha">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M4.75 19.25h4l9.5-9.5a2.12 2.12 0 0 0-3-3l-9.5 9.5-1 3Z"></path><path d="m13.75 8.25 3 3"></path></svg>
+                            </button>
+                            <button type="button" class="icon-button icon-button--danger" th:attr="data-modal-open=${'modal-excluir-campanha-' + c.id}" aria-label="Excluir campanha">
+                                <svg viewBox="0 0 24 24" focusable="false"><path d="M5 7h14"></path><path d="M9 7V5.75A1.75 1.75 0 0 1 10.75 4h2.5A1.75 1.75 0 0 1 15 5.75V7"></path><path d="M17.5 7l-.7 11.1a2 2 0 0 1-2 1.9H9.2a2 2 0 0 1-2-1.9L6.5 7"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <dialog th:id="${'modal-editar-campanha-' + c.id}" class="modal">
+                        <form th:action="@{/admin/campanhas}" method="post" class="modal-panel">
+                            <input type="hidden" name="id" th:value="${c.id}">
+                            <div class="modal-header">
+                                <div>
+                                    <h3 class="card-title" th:text="${'Editar ' + c.nome}">Editar campanha</h3>
+                                    <p class="card-meta">Atualize os dados da campanha.</p>
+                                </div>
+                                <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                                    <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                                </button>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label th:for="${'campanhaNome' + c.id}">Nome</label>
+                                    <input type="text" th:id="${'campanhaNome' + c.id}" name="nome" class="form-control" th:value="${c.nome}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'campanhaPublico' + c.id}">Público-alvo</label>
+                                    <input type="text" th:id="${'campanhaPublico' + c.id}" name="publicoAlvo" class="form-control" th:value="${c.publicoAlvo}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'campanhaInicio' + c.id}">Início</label>
+                                    <input type="date" th:id="${'campanhaInicio' + c.id}" name="dataInicio" class="form-control" th:value="${#dates.format(c.dataInicio, 'yyyy-MM-dd')}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'campanhaFim' + c.id}">Fim</label>
+                                    <input type="date" th:id="${'campanhaFim' + c.id}" name="dataFim" class="form-control" th:value="${#dates.format(c.dataFim, 'yyyy-MM-dd')}" required>
+                                </div>
+                                <div class="form-group form-group--full">
+                                    <label th:for="${'campanhaDescricao' + c.id}">Descrição</label>
+                                    <input type="text" th:id="${'campanhaDescricao' + c.id}" name="descricao" class="form-control" th:value="${c.descricao}" required>
+                                </div>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                                <button type="submit" class="btn">Salvar alterações</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <dialog th:id="${'modal-excluir-campanha-' + c.id}" class="modal modal--sm">
+                        <form th:action="@{/admin/campanhas/{id}/excluir(id=${c.id})}" method="post" class="modal-panel">
+                            <div class="modal-header">
+                                <div>
+                                    <h3 class="card-title">Excluir campanha</h3>
+                                    <p class="card-meta" th:text="${'Confirmar exclusão de ' + c.nome + '?'}"></p>
+                                </div>
+                                <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                                    <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                                </button>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                                <button type="submit" class="btn btn--danger">Excluir</button>
+                            </div>
+                        </form>
+                    </dialog>
+                </div>
             </div>
         </section>
     </div>
@@ -502,52 +620,61 @@
                 <h1 class="section-title">Gerenciar Usuários</h1>
                 <p class="section-description">Cadastre usuários e acompanhe os perfis registrados no sistema.</p>
             </div>
+            <button type="button" class="btn" data-modal-open="modal-novo-usuario">Novo usuário</button>
         </div>
 
-        <div class="two-column">
-            <section>
-                <form th:action="@{/usuarios}" method="post" class="form-panel">
-                    <h2 class="card-title">Novo Usuário</h2>
-                    <div class="form-group">
-                        <label for="nome">Nome</label>
-                        <input type="text" id="nome" name="nome" class="form-control" required>
+        <dialog id="modal-novo-usuario" class="modal modal--sm">
+            <form th:action="@{/usuarios}" method="post" class="modal-panel">
+                <div class="modal-header">
+                    <div>
+                        <h2 class="card-title">Novo usuário</h2>
+                        <p class="card-meta">Crie o acesso do paciente ao portal.</p>
                     </div>
-                    <div class="form-group">
-                        <label for="idade">Idade</label>
-                        <input type="number" id="idade" name="idade" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">E-mail</label>
-                        <input type="email" id="email" name="email" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="senha">Senha temporária</label>
-                        <input type="password" id="senha" name="senha" class="form-control" minlength="6" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn">Cadastrar usuário</button>
-                    </div>
-                </form>
-                <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
-                <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
-            </section>
+                    <button type="button" class="icon-button" data-modal-close aria-label="Fechar modal">
+                        <svg viewBox="0 0 24 24" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="idade">Idade</label>
+                    <input type="number" id="idade" name="idade" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha temporária</label>
+                    <input type="password" id="senha" name="senha" class="form-control" minlength="6" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn--ghost" data-modal-close>Cancelar</button>
+                    <button type="submit" class="btn">Cadastrar usuário</button>
+                </div>
+            </form>
+        </dialog>
 
-            <section>
-                <h2 class="section-label">Lista de usuários</h2>
-                <div class="scroll-panel">
-                    <div th:each="u : ${usuarios}" class="card">
-                        <div class="resource-row">
-                            <div>
-                                <h3 class="card-title" th:text="${u.nome}"></h3>
-                                <p th:text="${u.idade + ' anos'}"></p>
-                                <p class="card-meta" th:text="${u.email}"></p>
-                            </div>
-                            <span class="badge badge-primary" th:text="${u.role}"></span>
+        <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
+        <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
+
+        <section>
+            <h2 class="section-label">Lista de usuários</h2>
+            <div class="scroll-panel">
+                <div th:each="u : ${usuarios}" class="card">
+                    <div class="resource-row">
+                        <div>
+                            <h3 class="card-title" th:text="${u.nome}"></h3>
+                            <p th:text="${u.idade + ' anos'}"></p>
+                            <p class="card-meta" th:text="${u.email}"></p>
                         </div>
+                        <span class="badge badge-primary" th:text="${u.role}"></span>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
     </div>
 
 </body>

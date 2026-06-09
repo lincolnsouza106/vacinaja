@@ -3,6 +3,7 @@ package br.com.vacinaja.service;
 import br.com.vacinaja.model.PostoSaude;
 import br.com.vacinaja.repository.PostoSaudeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,13 @@ public class PostoService {
 
     public PostoSaude buscarPorId(Long id) {
         return postoRepository.findById(id).orElseThrow(() -> new RuntimeException("Posto nao encontrado"));
+    }
+
+    @Transactional
+    public void excluirPosto(Long id) {
+        PostoSaude posto = buscarPorId(id);
+        posto.getVacinasDisponiveis().clear();
+        postoRepository.delete(posto);
     }
 
     public List<PostoSaude> buscarPorRegiaoEVacina(String regiao, String vacinaNome) {

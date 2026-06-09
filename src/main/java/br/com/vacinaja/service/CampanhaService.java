@@ -24,4 +24,8 @@ public class CampanhaService {
     public Campanha buscarPorId(Long id) {
         return campanhaRepository.findById(id).orElseThrow(() -> new RuntimeException("Campanha nao encontrada"));
     }
+
+    public void excluirCampanha(Long id) {
+        campanhaRepository.deleteById(id);
+    }
 }
