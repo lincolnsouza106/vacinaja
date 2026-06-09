@@ -5,53 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <title>VacinaBrasil - Sistema Nacional</title>
+    <title>VacinaJá - Sistema Nacional</title>
 </head>
 <body>
-    <div id="app" style="display: block;">
-        
-        <!-- Top Navbar -->
-        <nav class="navbar">
-            <a href="/" class="navbar-brand">
-                VacinaBrasil <span>Sistema Nacional de Vacinação</span>
+    <div class="app-shell" th:with="pageLabel=${view == 'vacinas' ? 'Início' : (view == 'postos' ? 'Postos de Vacinação' : (view == 'campanhas' ? 'Campanhas' : (view == 'registrar' ? 'Carteira Digital' : (view == 'agendamentos' ? 'Agendamentos' : (view == 'pendencias' ? 'Pendências' : 'Gerenciar Usuários')))))}">
+        <nav class="topbar" aria-label="Navegação principal">
+            <a th:href="@{/}" class="brand">
+                <span class="brand-mark">VJ</span>
+                <span class="brand-copy">
+                    <span class="brand-name">VacinaJá</span>
+                    <span class="brand-subtitle">Sistema nacional de vacinação</span>
+                </span>
             </a>
-            
+
             <ul class="nav-links">
                 <li><a th:href="@{/}" th:class="${view == 'vacinas'} ? 'nav-item active' : 'nav-item'">Início</a></li>
-                <li><a th:href="@{/postos}" th:class="${view == 'postos'} ? 'nav-item active' : 'nav-item'">Postos de Vacinação</a></li>
+                <li><a th:href="@{/postos}" th:class="${view == 'postos'} ? 'nav-item active' : 'nav-item'">Postos</a></li>
                 <li><a th:href="@{/campanhas}" th:class="${view == 'campanhas'} ? 'nav-item active' : 'nav-item'">Campanhas</a></li>
-                <li><a th:href="@{/registrar}" th:class="${view == 'registrar'} ? 'nav-item active' : 'nav-item'">Carteira Digital</a></li>
-                <li><a th:href="@{/pendencias}" th:class="${view == 'pendencias'} ? 'nav-item active' : 'nav-item'">Agendamento</a></li>
-                <!-- Apenas Admin vê Gerenciamento -->
-                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/usuarios}" th:class="${view == 'usuarios'} ? 'nav-item active' : 'nav-item'">Gerenciar Usuários</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/registrar}" th:class="${view == 'registrar'} ? 'nav-item active' : 'nav-item'">Carteira Digital</a></li>
+                <li><a th:href="@{/agendamentos}" th:class="${view == 'agendamentos'} ? 'nav-item active' : 'nav-item'">Agendamentos</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/usuarios}" th:class="${view == 'usuarios'} ? 'nav-item active' : 'nav-item'">Usuários</a></li>
             </ul>
 
             <div class="nav-user">
-                <div sec:authorize="isAuthenticated()" style="display:flex; align-items:center; gap: 0.5rem;">
+                <div sec:authorize="isAuthenticated()" class="user-menu">
                     <div class="avatar" th:text="${#strings.substring(#authentication.name, 0, 2).toUpperCase()}">MC</div>
-                    <form th:action="@{/logout}" method="post" style="margin:0;">
-                        <button type="submit" style="background:transparent; border:none; color:rgba(255,255,255,0.8); cursor:pointer; font-size:0.85rem; text-decoration:underline;">Sair</button>
+                    <form th:action="@{/logout}" method="post" class="logout-form">
+                        <button type="submit" class="btn btn--ghost">Sair</button>
                     </form>
                 </div>
                 <div sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/login}" class="btn" style="background: white; color: var(--primary);">Entrar</a>
+                    <a th:href="@{/login}" class="btn btn--light">Entrar</a>
                 </div>
             </div>
         </nav>
 
-        <!-- Breadcrumb -->
         <div class="breadcrumb">
-            Portal > <span th:text="${view == 'vacinas' ? 'Início' : (view == 'postos' ? 'Postos de Vacinação' : (view == 'campanhas' ? 'Campanhas' : (view == 'registrar' ? 'Carteira Digital' : 'Página')))}">Início</span>
+            <div class="breadcrumb-inner">
+                <span>Portal</span>
+                <span aria-hidden="true">/</span>
+                <span class="breadcrumb-current" th:text="${pageLabel}">Início</span>
+            </div>
         </div>
-        
-        <!-- Main Content Area -->
+
         <main class="content-wrapper">
-            <!-- Alert Banner (Somente na Home e se logado) -->
-            <div sec:authorize="isAuthenticated()" th:if="${view == 'vacinas'}" class="alert-banner">
-                <span style="font-weight:700; margin-right:0.5rem;">Alerta:</span> Dose pendente: COVID-19 — agendada para 14 de fevereiro de 2026
-                <a href="/pendencias">Ver detalhes</a>
+            <div sec:authorize="isAuthenticated()" th:if="${view == 'vacinas'}" class="notice">
+                <p><strong>Alerta:</strong> Dose pendente de COVID-19 agendada para 14 de fevereiro de 2026.</p>
+                <a th:href="@{/pendencias}" class="btn btn--light">Ver detalhes</a>
             </div>
 
             <div th:if="${view == 'vacinas'}">
@@ -65,6 +67,9 @@
             </div>
             <div th:if="${view == 'pendencias'}">
                 <div th:replace="~{fragments :: pendencias}"></div>
+            </div>
+            <div th:if="${view == 'agendamentos'}">
+                <div th:replace="~{fragments :: agendamentos}"></div>
             </div>
             <div th:if="${view == 'usuarios'}">
                 <div th:replace="~{fragments :: usuarios}"></div>

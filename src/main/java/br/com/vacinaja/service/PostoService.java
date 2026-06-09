@@ -22,6 +22,10 @@ public class PostoService {
         return postoRepository.findAll();
     }
 
+    public PostoSaude buscarPorId(Long id) {
+        return postoRepository.findById(id).orElseThrow(() -> new RuntimeException("Posto nao encontrado"));
+    }
+
     public List<PostoSaude> buscarPorRegiaoEVacina(String regiao, String vacinaNome) {
         List<PostoSaude> postos;
         if (regiao != null && !regiao.isEmpty()) {

@@ -21,6 +21,10 @@ public class VacinaService {
         return vacinaRepository.findAll();
     }
 
+    public Vacina buscarPorId(Long id) {
+        return vacinaRepository.findById(id).orElseThrow(() -> new RuntimeException("Vacina nao encontrada"));
+    }
+
     public List<Vacina> consultarPorIdade(int idade) {
         return vacinaRepository.findByIdadeMinimaLessThanEqualAndIdadeMaximaGreaterThanEqual(idade, idade);
     }

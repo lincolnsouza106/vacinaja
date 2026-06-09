@@ -1,18 +1,16 @@
 package br.com.vacinaja.config;
 
+import br.com.vacinaja.repository.UsuarioRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -24,7 +22,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/usuarios/**").hasRole("ADMIN")
+                .requestMatchers("/usuarios/**", "/registrar/**", "/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -33,10 +31,9 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
-            // Needed to access H2 Console
             .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
             .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
@@ -44,20 +41,18 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        UserDetails admin = User.builder()
-            .username("admin")
-            .password(encoder.encode("admin"))
-            .roles("ADMIN")
-            .build();
-        
-        UserDetails user = User.builder()
-            .username("user")
-            .password(encoder.encode("user"))
-            .roles("USER")
-            .build();
+    public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
+        return email -> usuarioRepository.findByEmail(email.toLowerCase())
+            .map(usuario -> User.builder()
+                .username(usuario.getEmail())
+                .password(usuario.getSenha())
+                .roles(usuario.getRole())
+                .build())
+            .orElseThrow(() -> new UsernameNotFoundException("Usuario nao encontrado"));
+    }
 
-        return new InMemoryUserDetailsManager(admin, user);
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

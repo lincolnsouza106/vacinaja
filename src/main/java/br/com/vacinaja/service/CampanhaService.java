@@ -20,4 +20,8 @@ public class CampanhaService {
     public List<Campanha> listarCampanhas() {
         return campanhaRepository.findAll();
     }
+
+    public Campanha buscarPorId(Long id) {
+        return campanhaRepository.findById(id).orElseThrow(() -> new RuntimeException("Campanha nao encontrada"));
+    }
 }

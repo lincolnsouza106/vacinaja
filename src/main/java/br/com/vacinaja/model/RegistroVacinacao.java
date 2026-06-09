@@ -20,7 +20,7 @@ public class RegistroVacinacao {
     private Vacina vacina;
 
     @ManyToOne
-    @JoinColumn(name = "posto_id")
+    @JoinColumn(name = "posto_saude_id")
     private PostoSaude postoSaude;
 
     @ManyToOne

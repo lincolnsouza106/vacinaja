@@ -1,12 +1,13 @@
 package br.com.vacinaja.service;
 
+import br.com.vacinaja.model.RegistroVacinacao;
 import br.com.vacinaja.model.Usuario;
 import br.com.vacinaja.model.Vacina;
-import br.com.vacinaja.model.RegistroVacinacao;
+import br.com.vacinaja.repository.RegistroVacinacaoRepository;
 import br.com.vacinaja.repository.UsuarioRepository;
 import br.com.vacinaja.repository.VacinaRepository;
-import br.com.vacinaja.repository.RegistroVacinacaoRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,15 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorId(Long id) {
-        return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario nao encontrado"));
+    }
+
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email.toLowerCase()).orElseThrow(() -> new RuntimeException("Usuario nao encontrado"));
+    }
+
+    public boolean emailJaCadastrado(String email) {
+        return usuarioRepository.existsByEmail(email.toLowerCase());
     }
 
     public RegistroVacinacao registrarVacinacao(RegistroVacinacao registro) {
@@ -43,7 +52,7 @@ public class UsuarioService {
         List<Long> vacinasTomadas = usuario.getListaRegistroVacinacao().stream()
             .map(r -> r.getVacina().getId())
             .collect(Collectors.toList());
-            
+
         List<Vacina> todasVacinas = vacinaRepository.findAll();
         return todasVacinas.stream()
             .filter(v -> !vacinasTomadas.contains(v.getId()))

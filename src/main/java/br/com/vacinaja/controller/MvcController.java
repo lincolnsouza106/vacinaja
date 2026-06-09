@@ -1,13 +1,33 @@
 package br.com.vacinaja.controller;
 
-import br.com.vacinaja.model.*;
-import br.com.vacinaja.service.*;
+import br.com.vacinaja.dto.UsuarioDTO;
+import br.com.vacinaja.model.Campanha;
+import br.com.vacinaja.model.PostoSaude;
+import br.com.vacinaja.model.RegistroVacinacao;
+import br.com.vacinaja.model.Usuario;
+import br.com.vacinaja.model.Vacina;
+import br.com.vacinaja.service.AgendamentoService;
+import br.com.vacinaja.service.CampanhaService;
+import br.com.vacinaja.service.PostoService;
+import br.com.vacinaja.service.UsuarioService;
+import br.com.vacinaja.service.VacinaService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,12 +38,21 @@ public class MvcController {
     private final VacinaService vacinaService;
     private final PostoService postoService;
     private final CampanhaService campanhaService;
+    private final AgendamentoService agendamentoService;
+    private final PasswordEncoder passwordEncoder;
 
-    public MvcController(UsuarioService usuarioService, VacinaService vacinaService, PostoService postoService, CampanhaService campanhaService) {
+    public MvcController(UsuarioService usuarioService,
+                         VacinaService vacinaService,
+                         PostoService postoService,
+                         CampanhaService campanhaService,
+                         AgendamentoService agendamentoService,
+                         PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
         this.vacinaService = vacinaService;
         this.postoService = postoService;
         this.campanhaService = campanhaService;
+        this.agendamentoService = agendamentoService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/login")
@@ -46,11 +75,34 @@ public class MvcController {
         model.addAttribute("view", "postos");
         model.addAttribute("regiao", regiao);
         model.addAttribute("vacinaNome", vacinaNome);
+        model.addAttribute("vacinas", vacinaService.listarVacinas());
+        model.addAttribute("todosPostos", postoService.listarPostos());
         if (regiao != null || vacinaNome != null) {
             model.addAttribute("postos", postoService.buscarPorRegiaoEVacina(regiao, vacinaNome));
             model.addAttribute("buscou", true);
         }
         return "index";
+    }
+
+    @PostMapping("/admin/postos")
+    public String salvarPosto(@RequestParam(required = false) Long id,
+                              @RequestParam String nome,
+                              @RequestParam String endereco,
+                              @RequestParam String regiao,
+                              @RequestParam String horarioFuncionamento,
+                              @RequestParam String telefone,
+                              @RequestParam(required = false) List<Long> vacinaIds,
+                              RedirectAttributes redirectAttributes) {
+        PostoSaude posto = id != null ? postoService.buscarPorId(id) : new PostoSaude();
+        posto.setNome(nome);
+        posto.setEndereco(endereco);
+        posto.setRegiao(regiao);
+        posto.setHorarioFuncionamento(horarioFuncionamento);
+        posto.setTelefone(telefone);
+        posto.setVacinasDisponiveis(buscarVacinas(vacinaIds));
+        postoService.cadastrarPosto(posto);
+        redirectAttributes.addFlashAttribute("mensagem", "Posto salvo com sucesso!");
+        return "redirect:/postos";
     }
 
     @GetMapping("/registrar")
@@ -63,32 +115,94 @@ public class MvcController {
     }
 
     @PostMapping("/registrar")
-    public String salvarRegistro(@RequestParam Long usuarioId, 
-                                 @RequestParam Long vacinaId, 
+    public String salvarRegistro(@RequestParam Long usuarioId,
+                                 @RequestParam Long vacinaId,
                                  @RequestParam Long postoId,
                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date data,
                                  @RequestParam String dose,
                                  RedirectAttributes redirectAttributes) {
         try {
             Usuario usuario = usuarioService.buscarPorId(usuarioId);
-            Vacina vacina = vacinaService.listarVacinas().stream().filter(v -> v.getId().equals(vacinaId)).findFirst().orElseThrow();
-            PostoSaude posto = postoService.listarPostos().stream().filter(p -> p.getId().equals(postoId)).findFirst().orElseThrow();
+            Vacina vacina = vacinaService.buscarPorId(vacinaId);
+            PostoSaude posto = postoService.buscarPorId(postoId);
 
             RegistroVacinacao registro = new RegistroVacinacao(dose, data, vacina, posto);
             registro.setUsuario(usuario);
             usuario.adicionarRegistro(registro);
-            usuarioService.cadastrarUsuario(usuario); // Save updates to user list of records
-            
-            redirectAttributes.addFlashAttribute("mensagem", "Vacinação registrada com sucesso!");
+            usuarioService.cadastrarUsuario(usuario);
+
+            redirectAttributes.addFlashAttribute("mensagem", "Vacinacao registrada com sucesso!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensagem", "Erro ao registrar vacinação.");
+            redirectAttributes.addFlashAttribute("mensagem", "Erro ao registrar vacinacao.");
         }
         return "redirect:/registrar";
     }
 
+    @GetMapping("/agendamentos")
+    public String agendamentos(Model model, Authentication authentication) {
+        model.addAttribute("view", "agendamentos");
+        model.addAttribute("admin", isAdmin(authentication));
+        model.addAttribute("vacinas", vacinaService.listarVacinas());
+        model.addAttribute("postos", postoService.listarPostos());
+
+        if (isAdmin(authentication)) {
+            model.addAttribute("usuarios", usuarioService.listarUsuarios());
+            model.addAttribute("agendamentos", agendamentoService.listarTodos());
+            return "index";
+        }
+
+        Usuario usuario = usuarioService.buscarPorEmail(authentication.getName());
+        model.addAttribute("usuarioAtual", usuario);
+        model.addAttribute("agendamentos", agendamentoService.listarPorUsuario(usuario));
+        return "index";
+    }
+
+    @PostMapping("/agendamentos")
+    public String salvarAgendamento(@RequestParam(required = false) Long usuarioId,
+                                    @RequestParam Long vacinaId,
+                                    @RequestParam Long postoId,
+                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
+                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horario,
+                                    @RequestParam(required = false) String observacao,
+                                    Authentication authentication,
+                                    RedirectAttributes redirectAttributes) {
+        Usuario usuario = isAdmin(authentication) && usuarioId != null
+            ? usuarioService.buscarPorId(usuarioId)
+            : usuarioService.buscarPorEmail(authentication.getName());
+        agendamentoService.agendar(usuario, vacinaService.buscarPorId(vacinaId), postoService.buscarPorId(postoId), data, horario, observacao);
+        redirectAttributes.addFlashAttribute("mensagem", "Agendamento criado com sucesso!");
+        return "redirect:/agendamentos";
+    }
+
+    @PostMapping("/agendamentos/{id}/cancelar")
+    public String cancelarAgendamento(@PathVariable Long id, Authentication authentication, RedirectAttributes redirectAttributes) {
+        if (!isAdmin(authentication)) {
+            Usuario usuario = usuarioService.buscarPorEmail(authentication.getName());
+            if (!agendamentoService.buscarPorId(id).getUsuario().getId().equals(usuario.getId())) {
+                redirectAttributes.addFlashAttribute("erroValidacao", "Voce nao pode cancelar este agendamento.");
+                return "redirect:/agendamentos";
+            }
+        }
+        agendamentoService.cancelar(id);
+        redirectAttributes.addFlashAttribute("mensagem", "Agendamento cancelado.");
+        return "redirect:/agendamentos";
+    }
+
     @GetMapping("/pendencias")
-    public String pendencias(Model model, @RequestParam(required = false) Long usuarioId) {
+    public String pendencias(Model model, @RequestParam(required = false) Long usuarioId, Authentication authentication) {
         model.addAttribute("view", "pendencias");
+        boolean admin = isAdmin(authentication);
+        model.addAttribute("admin", admin);
+
+        if (!admin && authentication != null) {
+            Usuario usuario = usuarioService.buscarPorEmail(authentication.getName());
+            model.addAttribute("usuarioAtual", usuario);
+            model.addAttribute("usuarioId", usuario.getId());
+            model.addAttribute("pendentes", usuarioService.verificarPendencias(usuario.getId()));
+            model.addAttribute("buscou", true);
+            return "index";
+        }
+
         model.addAttribute("usuarios", usuarioService.listarUsuarios());
         if (usuarioId != null) {
             model.addAttribute("usuarioId", usuarioId);
@@ -105,6 +219,25 @@ public class MvcController {
         return "index";
     }
 
+    @PostMapping("/admin/campanhas")
+    public String salvarCampanha(@RequestParam(required = false) Long id,
+                                 @RequestParam String nome,
+                                 @RequestParam String descricao,
+                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dataInicio,
+                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dataFim,
+                                 @RequestParam String publicoAlvo,
+                                 RedirectAttributes redirectAttributes) {
+        Campanha campanha = id != null ? campanhaService.buscarPorId(id) : new Campanha();
+        campanha.setNome(nome);
+        campanha.setDescricao(descricao);
+        campanha.setDataInicio(dataInicio);
+        campanha.setDataFim(dataFim);
+        campanha.setPublicoAlvo(publicoAlvo);
+        campanhaService.cadastrarCampanha(campanha);
+        redirectAttributes.addFlashAttribute("mensagem", "Campanha salva com sucesso!");
+        return "redirect:/campanhas";
+    }
+
     @GetMapping("/usuarios")
     public String usuarios(Model model) {
         model.addAttribute("view", "usuarios");
@@ -113,14 +246,39 @@ public class MvcController {
     }
 
     @PostMapping("/usuarios")
-    public String cadastrarUsuario(@jakarta.validation.Valid @ModelAttribute br.com.vacinaja.dto.UsuarioDTO dto, org.springframework.validation.BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    public String cadastrarUsuario(@Valid @ModelAttribute UsuarioDTO dto,
+                                   BindingResult result,
+                                   RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute("erroValidacao", result.getAllErrors().get(0).getDefaultMessage());
             return "redirect:/usuarios";
         }
-        Usuario novo = new Usuario(dto.getNome(), dto.getIdade());
+
+        String email = dto.getEmail().trim().toLowerCase();
+        if (usuarioService.emailJaCadastrado(email)) {
+            redirectAttributes.addFlashAttribute("erroValidacao", "Ja existe um usuario cadastrado com esse e-mail.");
+            return "redirect:/usuarios";
+        }
+
+        Usuario novo = new Usuario(dto.getNome(), dto.getIdade(), email, passwordEncoder.encode(dto.getSenha()), "USER");
         usuarioService.cadastrarUsuario(novo);
-        redirectAttributes.addFlashAttribute("mensagem", "Usuário cadastrado com sucesso!");
+        redirectAttributes.addFlashAttribute("mensagem", "Usuario cadastrado com sucesso!");
         return "redirect:/usuarios";
+    }
+
+    private List<Vacina> buscarVacinas(List<Long> vacinaIds) {
+        List<Vacina> vacinas = new ArrayList<>();
+        if (vacinaIds == null) {
+            return vacinas;
+        }
+        for (Long vacinaId : vacinaIds) {
+            vacinas.add(vacinaService.buscarPorId(vacinaId));
+        }
+        return vacinas;
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+            .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 }

@@ -1,34 +1,66 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
-    <!-- Fragment: Início / Dashboard -->
     <div th:fragment="vacinas">
         <div class="section-header">
             <div>
-                <h1 style="font-size: 1.5rem;">Painel de Vacinação</h1>
-                <p>Acompanhe sua situação vacinal e campanhas ativas</p>
+                <div class="section-eyebrow">Painel</div>
+                <h1 class="section-title">Painel de Vacinação</h1>
+                <p class="section-description">Acompanhe sua situação vacinal, campanhas ativas e próximos passos da carteira digital.</p>
             </div>
-            <a th:href="@{/pendencias}" class="btn">Agendar Vacina</a>
+            <a th:href="@{/pendencias}" class="btn btn--secondary">Agendar Vacina</a>
         </div>
 
         <div class="kpi-grid">
             <div class="kpi-card">
+                <span class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M9 12.75 11.25 15 15 9.75"></path>
+                        <path d="M12 3.75 19.25 7v5.2c0 4.25-2.78 7.95-7.25 9.05-4.47-1.1-7.25-4.8-7.25-9.05V7L12 3.75Z"></path>
+                    </svg>
+                </span>
                 <span class="kpi-title">Vacinas Aplicadas</span>
                 <span class="kpi-value text-success">3</span>
                 <span class="kpi-subtitle">de 6 disponíveis</span>
             </div>
             <div class="kpi-card">
+                <span class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M7 4.75v3.5"></path>
+                        <path d="M17 4.75v3.5"></path>
+                        <path d="M4.75 9.25h14.5"></path>
+                        <path d="M6.75 6.25h10.5a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6.75a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"></path>
+                        <path d="M8.25 13.25h3.5"></path>
+                        <path d="M8.25 16.25h6.5"></path>
+                    </svg>
+                </span>
                 <span class="kpi-title">Campanhas Ativas</span>
-                <span class="kpi-value" style="color: var(--primary);">3</span>
+                <span class="kpi-value text-brand">3</span>
                 <span class="kpi-subtitle">em andamento</span>
             </div>
             <div class="kpi-card">
+                <span class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M4.75 19.25h14.5"></path>
+                        <path d="M7.25 16.25v-4.5"></path>
+                        <path d="M12 16.25v-8.5"></path>
+                        <path d="M16.75 16.25v-6.5"></path>
+                        <path d="M6 7.75 9.25 5l3.5 2.75L18 4.75"></path>
+                    </svg>
+                </span>
                 <span class="kpi-title">Cobertura Vacinal</span>
-                <span class="kpi-value" style="color: #8b5cf6;">50%</span>
+                <span class="kpi-value text-purple">50%</span>
                 <span class="kpi-subtitle">do esquema recomendado</span>
             </div>
             <div class="kpi-card">
+                <span class="kpi-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M12 6.75v5.5l3 2"></path>
+                        <path d="M19.25 12A7.25 7.25 0 1 1 12 4.75 7.25 7.25 0 0 1 19.25 12Z"></path>
+                        <path d="M17.5 5.75 19.25 4"></path>
+                    </svg>
+                </span>
                 <span class="kpi-title">Próxima Dose</span>
                 <span class="kpi-value text-warning">14 fev</span>
                 <span class="kpi-subtitle">COVID-19</span>
@@ -38,184 +70,483 @@
         <div class="progress-card">
             <div class="progress-header">
                 <div>
-                    <h3 style="font-size: 1rem; margin-bottom:0;">Progresso do Esquema Vacinal</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">3 de 6 vacinas aplicadas</p>
+                    <h3 class="progress-title">Progresso do Esquema Vacinal</h3>
+                    <p class="card-meta">3 de 6 vacinas aplicadas</p>
                 </div>
-                <span style="font-weight:700; color:var(--primary);">50%</span>
+                <span class="progress-value">50%</span>
             </div>
-            <div class="progress-track">
-                <div class="progress-fill" style="width: 50%;"></div>
+            <div class="progress-track" aria-label="50% do esquema vacinal concluído">
+                <div class="progress-fill progress-fill--half"></div>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-            <div>
-                <h3 style="font-size: 1rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;">Campanhas em Andamento</h3>
-                <div class="list-item">
-                    <div class="list-item-icon" style="font-size: 1rem;">Camp</div>
-                    <div class="list-item-content" style="flex:1;">
-                        <h3 style="font-size:1.05rem;">Campanha Nacional contra a Gripe</h3>
-                        <p>Proteja-se contra o vírus da gripe. Vacina disponível.</p>
-                        <p style="font-size:0.8rem; color:var(--text-light);">Até 29 de jun. de 2026</p>
+        <div class="split-layout">
+            <section>
+                <h2 class="section-label">Campanhas em andamento</h2>
+                <div class="stack">
+                    <div class="list-item">
+                        <div class="list-item-icon">Camp</div>
+                        <div class="list-item-content">
+                            <h3 class="card-title">Campanha Nacional contra a Gripe</h3>
+                            <p>Proteja-se contra o vírus da gripe. Vacina disponível.</p>
+                            <p class="card-meta">Até 29 de junho de 2026</p>
+                        </div>
+                        <span class="badge badge-success">Ativa</span>
                     </div>
-                    <span class="badge badge-success">Ativa</span>
-                </div>
-                <!-- Optional: Use the real vacinas list here as a fallback -->
-                <div th:each="v : ${vacinas}" class="list-item">
-                    <div class="list-item-icon" style="font-size: 1rem;">Vac</div>
-                    <div class="list-item-content">
-                        <h3 th:text="${v.nome}" style="font-size:1.05rem;"></h3>
-                        <p>Previne: <strong th:text="${v.doencaPrevenida}"></strong></p>
-                        <p style="font-size:0.8rem; color:var(--text-light);">Doses necessárias: <span th:text="${v.dosesNecessarias}"></span></p>
+                    <div th:each="v : ${vacinas}" class="list-item">
+                        <div class="list-item-icon">Vac</div>
+                        <div class="list-item-content">
+                            <h3 class="card-title" th:text="${v.nome}"></h3>
+                            <p>Previne: <strong th:text="${v.doencaPrevenida}"></strong></p>
+                            <p class="card-meta">Doses necessárias: <span th:text="${v.dosesNecessarias}"></span></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div>
-                <h3 style="font-size: 1rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;">Acesso Rápido</h3>
-                <div class="card" style="padding: 1rem;">
-                    <a th:href="@{/postos}" style="display:block; text-decoration:none; color:var(--text-main); margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">Postos Credenciados</a>
-                    <a th:href="@{/registrar}" style="display:block; text-decoration:none; color:var(--text-main); margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">Carteira Digital</a>
-                    <a th:href="@{/pendencias}" style="display:block; text-decoration:none; color:var(--text-main);">Agendar Vacina</a>
+            </section>
+
+            <aside>
+                <h2 class="section-label">Acesso rápido</h2>
+                <div class="quick-links">
+                    <a th:href="@{/postos}" class="quick-link">Postos Credenciados</a>
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/registrar}" class="quick-link">Carteira Digital</a>
+                    <a th:href="@{/agendamentos}" class="quick-link">Agendar Vacina</a>
                 </div>
-            </div>
+            </aside>
         </div>
     </div>
 
-    <!-- Fragment: Postos -->
     <div th:fragment="postos">
-        <h2>Localizar Posto de Saúde</h2>
-        <form th:action="@{/postos}" method="get">
-            <div class="form-group">
-                <label>Região (Opcional):</label>
-                <input type="text" name="regiao" class="form-control" placeholder="Ex: Zona Sul" th:value="${regiao}">
+        <div class="section-header">
+            <div>
+                <div class="section-eyebrow">Busca</div>
+                <h1 class="section-title">Localizar Posto de Saúde</h1>
+                <p class="section-description">Encontre unidades por região e disponibilidade de vacina.</p>
             </div>
-            <div class="form-group">
-                <label>Vacina desejada (Opcional):</label>
-                <input type="text" name="vacinaNome" class="form-control" placeholder="Ex: Gripe" th:value="${vacinaNome}">
+        </div>
+
+        <form th:action="@{/postos}" method="get" class="form-panel">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="regiao">Região</label>
+                    <input type="text" id="regiao" name="regiao" class="form-control" placeholder="Ex: Zona Sul" th:value="${regiao}">
+                </div>
+                <div class="form-group">
+                    <label for="vacinaNome">Vacina desejada</label>
+                    <input type="text" id="vacinaNome" name="vacinaNome" class="form-control" placeholder="Ex: Gripe" th:value="${vacinaNome}">
+                </div>
             </div>
-            <button type="submit" class="btn">Buscar</button>
+            <div class="form-actions">
+                <button type="submit" class="btn">Buscar postos</button>
+            </div>
         </form>
-        
-        <div class="bento-grid">
-            <div th:if="${buscou != null and (postos == null or postos.isEmpty())}" style="grid-column: 1 / -1;">
-                <p class="text-muted">Nenhum posto encontrado com esses critérios.</p>
+
+        <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
+        <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
+
+        <div class="result-grid">
+            <div th:if="${buscou != null and (postos == null or postos.isEmpty())}" class="empty-state">
+                Nenhum posto encontrado com esses critérios.
             </div>
-            <div th:each="p : ${postos}" class="card" style="margin-bottom: 0;">
-                <h3 th:text="${p.nome}"></h3>
+            <div th:each="p : ${postos}" class="card">
+                <h3 class="card-title" th:text="${p.nome}"></h3>
                 <p>Endereço: <strong th:text="${p.endereco}"></strong></p>
                 <p>Horário: <strong th:text="${p.horarioFuncionamento}"></strong></p>
                 <p>Telefone: <strong th:text="${p.telefone}"></strong></p>
             </div>
         </div>
+
+        <section sec:authorize="hasRole('ADMIN')" class="management-section">
+            <div class="section-header section-header--compact">
+                <div>
+                    <div class="section-eyebrow">Administração</div>
+                    <h2 class="section-title section-title--sm">Cadastro e edição de postos</h2>
+                    <p class="section-description">Atualize dados operacionais e vacinas disponíveis por unidade.</p>
+                </div>
+            </div>
+
+            <form th:action="@{/admin/postos}" method="post" class="form-panel">
+                <h3 class="card-title">Novo posto</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="postoNome">Nome</label>
+                        <input type="text" id="postoNome" name="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postoRegiao">Região</label>
+                        <input type="text" id="postoRegiao" name="regiao" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postoEndereco">Endereço</label>
+                        <input type="text" id="postoEndereco" name="endereco" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postoHorario">Horário</label>
+                        <input type="text" id="postoHorario" name="horarioFuncionamento" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postoTelefone">Telefone</label>
+                        <input type="text" id="postoTelefone" name="telefone" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postoVacinas">Vacinas disponíveis</label>
+                        <select id="postoVacinas" name="vacinaIds" class="form-control" multiple>
+                            <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Salvar posto</button>
+                </div>
+            </form>
+
+            <div class="result-grid">
+                <form th:each="p : ${todosPostos}" th:action="@{/admin/postos}" method="post" class="card edit-card">
+                    <input type="hidden" name="id" th:value="${p.id}">
+                    <h3 class="card-title" th:text="${p.nome}">Posto</h3>
+                    <div class="form-group">
+                        <label th:for="${'postoNome' + p.id}">Nome</label>
+                        <input type="text" th:id="${'postoNome' + p.id}" name="nome" class="form-control" th:value="${p.nome}" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label th:for="${'postoRegiao' + p.id}">Região</label>
+                            <input type="text" th:id="${'postoRegiao' + p.id}" name="regiao" class="form-control" th:value="${p.regiao}" required>
+                        </div>
+                        <div class="form-group">
+                            <label th:for="${'postoTelefone' + p.id}">Telefone</label>
+                            <input type="text" th:id="${'postoTelefone' + p.id}" name="telefone" class="form-control" th:value="${p.telefone}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label th:for="${'postoEndereco' + p.id}">Endereço</label>
+                        <input type="text" th:id="${'postoEndereco' + p.id}" name="endereco" class="form-control" th:value="${p.endereco}" required>
+                    </div>
+                    <div class="form-group">
+                        <label th:for="${'postoHorario' + p.id}">Horário</label>
+                        <input type="text" th:id="${'postoHorario' + p.id}" name="horarioFuncionamento" class="form-control" th:value="${p.horarioFuncionamento}" required>
+                    </div>
+                    <div class="form-group">
+                        <label th:for="${'postoVacinas' + p.id}">Vacinas</label>
+                        <select th:id="${'postoVacinas' + p.id}" name="vacinaIds" class="form-control" multiple>
+                            <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}" th:selected="${p.possuiVacina(v.id)}"></option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--light">Atualizar posto</button>
+                    </div>
+                </form>
+            </div>
+        </section>
     </div>
 
-    <!-- Fragment: Registrar -->
     <div th:fragment="registrar">
-        <h2>Registrar Vacinação</h2>
-        <form th:action="@{/registrar}" method="post">
-            <div class="form-group">
-                <label>Usuário:</label>
-                <select name="usuarioId" class="form-control" required>
-                    <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nome + ' (' + u.idade + ' anos)'}"></option>
-                </select>
+        <div class="section-header">
+            <div>
+                <div class="section-eyebrow">Carteira</div>
+                <h1 class="section-title">Registrar Vacinação</h1>
+                <p class="section-description">Lance doses aplicadas para manter a carteira digital atualizada.</p>
             </div>
-            <div class="form-group">
-                <label>Vacina:</label>
-                <select name="vacinaId" class="form-control" required>
-                    <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
-                </select>
+        </div>
+
+        <form th:action="@{/registrar}" method="post" class="form-panel">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="usuarioId">Usuário</label>
+                    <select id="usuarioId" name="usuarioId" class="form-control" required>
+                        <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nome + ' (' + u.idade + ' anos)'}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vacinaId">Vacina</label>
+                    <select id="vacinaId" name="vacinaId" class="form-control" required>
+                        <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="postoId">Posto de Saúde</label>
+                    <select id="postoId" name="postoId" class="form-control" required>
+                        <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="data">Data da Aplicação</label>
+                    <input type="date" id="data" name="data" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="dose">Dose</label>
+                    <input type="text" id="dose" name="dose" class="form-control" value="1" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Posto de Saúde:</label>
-                <select name="postoId" class="form-control" required>
-                    <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome}"></option>
-                </select>
+            <div class="form-actions">
+                <button type="submit" class="btn">Salvar registro</button>
             </div>
-            <div class="form-group">
-                <label>Data da Aplicação:</label>
-                <input type="date" name="data" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Dose (1, 2, Única, Reforço):</label>
-                <input type="text" name="dose" class="form-control" value="1" required>
-            </div>
-            <button type="submit" class="btn">Salvar Registro</button>
         </form>
-        <div th:if="${mensagem != null}" style="margin-top: 1rem; color: #10b981; font-weight: 500;" th:text="${mensagem}"></div>
+        <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
     </div>
 
-    <!-- Fragment: Pendencias -->
     <div th:fragment="pendencias">
-        <h2>Verificar Pendências</h2>
-        <form th:action="@{/pendencias}" method="get">
+        <div class="section-header">
+            <div>
+                <div class="section-eyebrow">Agendamento</div>
+                <h1 class="section-title">Verificar Pendências</h1>
+                <p class="section-description">Consulte doses em aberto por usuário e priorize os próximos atendimentos.</p>
+            </div>
+        </div>
+
+        <div sec:authorize="!hasRole('ADMIN')" th:if="${usuarioAtual != null}" class="form-panel">
+            <h2 class="card-title">Carteira de <span th:text="${usuarioAtual.nome}">usuario</span></h2>
+            <p class="card-meta">As pendências abaixo são calculadas automaticamente para sua conta.</p>
+        </div>
+
+        <form sec:authorize="hasRole('ADMIN')" th:action="@{/pendencias}" method="get" class="form-panel">
             <div class="form-group">
-                <label>Selecione o Usuário:</label>
-                <select name="usuarioId" class="form-control" required>
+                <label for="pendenciaUsuarioId">Usuário</label>
+                <select id="pendenciaUsuarioId" name="usuarioId" class="form-control" required>
                     <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nome}" th:selected="${u.id == usuarioId}"></option>
                 </select>
             </div>
-            <button type="submit" class="btn">Verificar</button>
-        </form>
-        
-        <div class="bento-grid">
-            <div th:if="${buscou != null and (pendentes == null or pendentes.isEmpty())}" style="grid-column: 1 / -1;">
-                <p class="text-success" style="font-weight: 500;">Carteira de vacinação em dia! Nenhuma pendência.</p>
+            <div class="form-actions">
+                <button type="submit" class="btn">Verificar pendências</button>
             </div>
-            <div th:each="v : ${pendentes}" class="card" style="margin-bottom: 0; border-left: 4px solid var(--danger);">
-                <h3 class="text-danger" th:text="${v.nome}"></h3>
+        </form>
+
+        <div class="result-grid">
+            <div th:if="${buscou != null and (pendentes == null or pendentes.isEmpty())}" class="empty-state text-success">
+                Carteira de vacinação em dia. Nenhuma pendência.
+            </div>
+            <div th:each="v : ${pendentes}" class="card card-accent-danger">
+                <h3 class="card-title text-danger" th:text="${v.nome}"></h3>
                 <p>Faltam doses. Requeridas: <strong th:text="${v.dosesNecessarias}"></strong></p>
             </div>
         </div>
     </div>
 
-    <!-- Fragment: Campanhas -->
-    <div th:fragment="campanhas">
-        <h2>Campanhas Atuais</h2>
-        <div th:if="${campanhas == null or campanhas.isEmpty()}" style="margin-top: 2rem;">
-            <p class="text-muted">Nenhuma campanha ativa no momento.</p>
+    <div th:fragment="agendamentos">
+        <div class="section-header">
+            <div>
+                <div class="section-eyebrow">Agenda</div>
+                <h1 class="section-title">Agendamentos</h1>
+                <p class="section-description">Escolha vacina, posto, data e horário para organizar o atendimento.</p>
+            </div>
         </div>
-        <div class="bento-grid">
-            <div th:each="c : ${campanhas}" class="card" style="margin-bottom: 0; border-top: 4px solid var(--primary);">
-                <h3 th:text="${c.nome}"></h3>
-                <p th:text="${c.descricao}" style="margin-bottom: 1rem;"></p>
+
+        <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
+        <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
+
+        <form th:action="@{/agendamentos}" method="post" class="form-panel">
+            <h2 class="card-title">Novo agendamento</h2>
+            <div class="form-grid">
+                <div sec:authorize="hasRole('ADMIN')" class="form-group">
+                    <label for="agendamentoUsuario">Usuário</label>
+                    <select id="agendamentoUsuario" name="usuarioId" class="form-control">
+                        <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.nome + ' - ' + u.email}"></option>
+                    </select>
+                </div>
+                <div sec:authorize="!hasRole('ADMIN')" th:if="${usuarioAtual != null}" class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" class="form-control" th:value="${usuarioAtual.nome}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="agendamentoVacina">Vacina</label>
+                    <select id="agendamentoVacina" name="vacinaId" class="form-control" required>
+                        <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="agendamentoPosto">Posto</label>
+                    <select id="agendamentoPosto" name="postoId" class="form-control" required>
+                        <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome + ' - ' + p.regiao}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="agendamentoData">Data</label>
+                    <input type="date" id="agendamentoData" name="data" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="agendamentoHorario">Horário</label>
+                    <input type="time" id="agendamentoHorario" name="horario" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="agendamentoObservacao">Observação</label>
+                    <input type="text" id="agendamentoObservacao" name="observacao" class="form-control" placeholder="Opcional">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn">Confirmar agendamento</button>
+            </div>
+        </form>
+
+        <section class="management-section">
+            <h2 class="section-label">Agenda registrada</h2>
+            <div class="result-grid">
+                <div th:if="${agendamentos == null or agendamentos.isEmpty()}" class="empty-state">
+                    Nenhum agendamento registrado.
+                </div>
+                <div th:each="a : ${agendamentos}" class="card">
+                    <div class="resource-row">
+                        <div>
+                            <h3 class="card-title" th:text="${a.vacina.nome}">Vacina</h3>
+                            <p th:text="${a.postoSaude.nome + ' - ' + a.postoSaude.regiao}"></p>
+                            <p class="card-meta" th:text="${a.usuario.nome + ' - ' + a.data + ' às ' + a.horario}"></p>
+                            <p class="card-meta" th:if="${a.observacao != null and !a.observacao.isEmpty()}" th:text="${a.observacao}"></p>
+                        </div>
+                        <span th:class="${a.status == 'CANCELADO'} ? 'badge badge-warning' : 'badge badge-success'" th:text="${a.status}"></span>
+                    </div>
+                    <form th:if="${a.status != 'CANCELADO'}" th:action="@{/agendamentos/{id}/cancelar(id=${a.id})}" method="post" class="form-actions">
+                        <button type="submit" class="btn btn--ghost">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div th:fragment="campanhas">
+        <div class="section-header">
+            <div>
+                <div class="section-eyebrow">Comunicação</div>
+                <h1 class="section-title">Campanhas Atuais</h1>
+                <p class="section-description">Acompanhe iniciativas ativas e públicos prioritários.</p>
+            </div>
+        </div>
+
+        <div th:if="${campanhas == null or campanhas.isEmpty()}" class="empty-state">
+            Nenhuma campanha ativa no momento.
+        </div>
+        <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
+        <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
+        <div class="result-grid">
+            <div th:each="c : ${campanhas}" class="card card-accent-brand">
+                <h3 class="card-title" th:text="${c.nome}"></h3>
+                <p th:text="${c.descricao}"></p>
                 <p><strong>Público:</strong> <span th:text="${c.publicoAlvo}"></span></p>
                 <p><strong>Período:</strong> <span th:text="${#dates.format(c.dataInicio, 'dd/MM/yyyy')} + ' a ' + ${#dates.format(c.dataFim, 'dd/MM/yyyy')}"></span></p>
             </div>
         </div>
-    </div>
 
-    <!-- Fragment: Usuarios -->
-    <div th:fragment="usuarios">
-        <h2>Gerenciar Usuários</h2>
-        <div style="display:flex; gap: 1rem; flex-wrap: wrap;">
-            <div style="flex:1; min-width: 250px;">
-                <form th:action="@{/usuarios}" method="post" class="card">
-                    <h3>Novo Usuário</h3>
-                    <div class="form-group">
-                        <label>Nome:</label>
-                        <input type="text" name="nome" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Idade:</label>
-                        <input type="number" name="idade" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn">Cadastrar</button>
-                </form>
-                <div th:if="${erroValidacao != null}" style="margin-top: 1rem; color: #ef4444; font-weight: 500;" th:text="${erroValidacao}"></div>
-                <div th:if="${mensagem != null}" style="margin-top: 1rem; color: #10b981; font-weight: 500;" th:text="${mensagem}"></div>
-            </div>
-            <div style="flex:1; min-width: 250px;">
-                <h3>Lista de Usuários</h3>
-                <div style="margin-top:1rem; max-height:400px; overflow-y:auto; padding-right:10px;">
-                    <div th:each="u : ${usuarios}" class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <h3 th:text="${u.nome}"></h3>
-                            <p th:text="${u.idade + ' anos'}"></p>
-                        </div>
-                        <div style="color:var(--text-muted); font-size:0.8rem" th:text="${'ID: ' + u.id}"></div>
-                    </div>
+        <section sec:authorize="hasRole('ADMIN')" class="management-section">
+            <div class="section-header section-header--compact">
+                <div>
+                    <div class="section-eyebrow">Administração</div>
+                    <h2 class="section-title section-title--sm">Cadastro e edição de campanhas</h2>
+                    <p class="section-description">Gerencie períodos, públicos prioritários e mensagens da campanha.</p>
                 </div>
             </div>
+
+            <form th:action="@{/admin/campanhas}" method="post" class="form-panel">
+                <h3 class="card-title">Nova campanha</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="campanhaNome">Nome</label>
+                        <input type="text" id="campanhaNome" name="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="campanhaPublico">Público-alvo</label>
+                        <input type="text" id="campanhaPublico" name="publicoAlvo" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="campanhaInicio">Início</label>
+                        <input type="date" id="campanhaInicio" name="dataInicio" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="campanhaFim">Fim</label>
+                        <input type="date" id="campanhaFim" name="dataFim" class="form-control" required>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="campanhaDescricao">Descrição</label>
+                        <input type="text" id="campanhaDescricao" name="descricao" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Salvar campanha</button>
+                </div>
+            </form>
+
+            <div class="result-grid">
+                <form th:each="c : ${campanhas}" th:action="@{/admin/campanhas}" method="post" class="card edit-card">
+                    <input type="hidden" name="id" th:value="${c.id}">
+                    <h3 class="card-title" th:text="${c.nome}">Campanha</h3>
+                    <div class="form-group">
+                        <label th:for="${'campanhaNome' + c.id}">Nome</label>
+                        <input type="text" th:id="${'campanhaNome' + c.id}" name="nome" class="form-control" th:value="${c.nome}" required>
+                    </div>
+                    <div class="form-group">
+                        <label th:for="${'campanhaDescricao' + c.id}">Descrição</label>
+                        <input type="text" th:id="${'campanhaDescricao' + c.id}" name="descricao" class="form-control" th:value="${c.descricao}" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label th:for="${'campanhaInicio' + c.id}">Início</label>
+                            <input type="date" th:id="${'campanhaInicio' + c.id}" name="dataInicio" class="form-control" th:value="${#dates.format(c.dataInicio, 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div class="form-group">
+                            <label th:for="${'campanhaFim' + c.id}">Fim</label>
+                            <input type="date" th:id="${'campanhaFim' + c.id}" name="dataFim" class="form-control" th:value="${#dates.format(c.dataFim, 'yyyy-MM-dd')}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label th:for="${'campanhaPublico' + c.id}">Público-alvo</label>
+                        <input type="text" th:id="${'campanhaPublico' + c.id}" name="publicoAlvo" class="form-control" th:value="${c.publicoAlvo}" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--light">Atualizar campanha</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <div th:fragment="usuarios">
+        <div class="section-header">
+            <div>
+                <div class="section-eyebrow">Administração</div>
+                <h1 class="section-title">Gerenciar Usuários</h1>
+                <p class="section-description">Cadastre usuários e acompanhe os perfis registrados no sistema.</p>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <section>
+                <form th:action="@{/usuarios}" method="post" class="form-panel">
+                    <h2 class="card-title">Novo Usuário</h2>
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="idade">Idade</label>
+                        <input type="number" id="idade" name="idade" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="senha">Senha temporária</label>
+                        <input type="password" id="senha" name="senha" class="form-control" minlength="6" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn">Cadastrar usuário</button>
+                    </div>
+                </form>
+                <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
+                <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
+            </section>
+
+            <section>
+                <h2 class="section-label">Lista de usuários</h2>
+                <div class="scroll-panel">
+                    <div th:each="u : ${usuarios}" class="card">
+                        <div class="resource-row">
+                            <div>
+                                <h3 class="card-title" th:text="${u.nome}"></h3>
+                                <p th:text="${u.idade + ' anos'}"></p>
+                                <p class="card-meta" th:text="${u.email}"></p>
+                            </div>
+                            <span class="badge badge-primary" th:text="${u.role}"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 

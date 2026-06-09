@@ -18,9 +18,9 @@ public class PostoSaude {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "posto_vacina",
-        joinColumns = @JoinColumn(name = "posto_id"),
-        inverseJoinColumns = @JoinColumn(name = "vacina_id")
+        name = "posto_saude_vacinas_disponiveis",
+        joinColumns = @JoinColumn(name = "posto_saude_id"),
+        inverseJoinColumns = @JoinColumn(name = "vacinas_disponiveis_id")
     )
     private List<Vacina> vacinasDisponiveis = new ArrayList<>();
 
@@ -59,5 +59,10 @@ public class PostoSaude {
         if (!this.vacinasDisponiveis.contains(vacina)) {
             this.vacinasDisponiveis.add(vacina);
         }
+    }
+
+    public boolean possuiVacina(Long vacinaId) {
+        return this.vacinasDisponiveis.stream()
+            .anyMatch(vacina -> vacina.getId() != null && vacina.getId().equals(vacinaId));
     }
 }
