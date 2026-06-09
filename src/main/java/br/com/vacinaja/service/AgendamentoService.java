@@ -20,6 +20,7 @@ public class AgendamentoService {
     }
 
     public Agendamento agendar(Usuario usuario, Vacina vacina, PostoSaude postoSaude, LocalDate data, LocalTime horario, String observacao) {
+        validarAgendamento(usuario, vacina, postoSaude, data, horario);
         Agendamento agendamento = new Agendamento(usuario, vacina, postoSaude, data, horario, observacao);
         return agendamentoRepository.save(agendamento);
     }
@@ -40,5 +41,24 @@ public class AgendamentoService {
         Agendamento agendamento = buscarPorId(id);
         agendamento.setStatus("CANCELADO");
         agendamentoRepository.save(agendamento);
+    }
+
+    private void validarAgendamento(Usuario usuario, Vacina vacina, PostoSaude postoSaude, LocalDate data, LocalTime horario) {
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Nao e possivel agendar para uma data passada.");
+        }
+        if (usuario.getIdade() < vacina.getIdadeMinima() || usuario.getIdade() > vacina.getIdadeMaxima()) {
+            throw new IllegalArgumentException("A vacina escolhida nao e indicada para a idade do usuario.");
+        }
+        if (!postoSaude.possuiVacina(vacina.getId())) {
+            throw new IllegalArgumentException("O posto selecionado nao possui a vacina escolhida.");
+        }
+        if (!postoSaude.funcionaNoDia(data.getDayOfWeek())) {
+            throw new IllegalArgumentException("O posto selecionado nao funciona nesse dia da semana.");
+        }
+        if (postoSaude.getHoraAbertura() != null && postoSaude.getHoraFechamento() != null
+            && (horario.isBefore(postoSaude.getHoraAbertura()) || horario.isAfter(postoSaude.getHoraFechamento()))) {
+            throw new IllegalArgumentException("O horario escolhido esta fora do funcionamento do posto.");
+        }
     }
 }

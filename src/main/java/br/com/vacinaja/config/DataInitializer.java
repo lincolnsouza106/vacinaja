@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalTime;
 import java.util.Calendar;
 
 @Configuration
@@ -36,6 +37,10 @@ public class DataInitializer {
                 vacinaRepository.save(gripe);
 
                 PostoSaude ubs1 = new PostoSaude("UBS Jardim America", "Av. das Nacoes, 789", "Zona Sul", "Seg-Sex 7h-19h", "(11) 5555-1234");
+                ubs1.setCep("01001-000");
+                ubs1.setDiasFuncionamento("MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY");
+                ubs1.setHoraAbertura(LocalTime.of(7, 0));
+                ubs1.setHoraFechamento(LocalTime.of(19, 0));
                 ubs1.adicionarVacinaDisponivel(febreAmarela);
                 ubs1.adicionarVacinaDisponivel(gripe);
                 postoRepository.save(ubs1);

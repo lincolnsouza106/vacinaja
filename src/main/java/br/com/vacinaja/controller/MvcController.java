@@ -98,17 +98,32 @@ public class MvcController {
     @PostMapping("/admin/postos")
     public String salvarPosto(@RequestParam(required = false) Long id,
                               @RequestParam String nome,
+                              @RequestParam(required = false) String cep,
                               @RequestParam String endereco,
                               @RequestParam String regiao,
-                              @RequestParam String horarioFuncionamento,
+                              @RequestParam(required = false) List<String> diasFuncionamento,
+                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horaAbertura,
+                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horaFechamento,
                               @RequestParam String telefone,
                               @RequestParam(required = false) List<Long> vacinaIds,
                               RedirectAttributes redirectAttributes) {
+        if (diasFuncionamento == null || diasFuncionamento.isEmpty()) {
+            redirectAttributes.addFlashAttribute("erroValidacao", "Selecione ao menos um dia de funcionamento.");
+            return "redirect:/postos";
+        }
+        if (!horaFechamento.isAfter(horaAbertura)) {
+            redirectAttributes.addFlashAttribute("erroValidacao", "O horario de fechamento deve ser posterior ao horario de abertura.");
+            return "redirect:/postos";
+        }
         PostoSaude posto = id != null ? postoService.buscarPorId(id) : new PostoSaude();
         posto.setNome(nome);
+        posto.setCep(cep);
         posto.setEndereco(endereco);
         posto.setRegiao(regiao);
-        posto.setHorarioFuncionamento(horarioFuncionamento);
+        posto.setDiasFuncionamento(formatarDiasFuncionamento(diasFuncionamento));
+        posto.setHoraAbertura(horaAbertura);
+        posto.setHoraFechamento(horaFechamento);
+        posto.setHorarioFuncionamento(posto.getHorarioFuncionamentoFormatado());
         posto.setTelefone(telefone);
         posto.setVacinasDisponiveis(buscarVacinas(vacinaIds));
         postoService.cadastrarPosto(posto);
@@ -186,6 +201,9 @@ public class MvcController {
             Usuario usuario = usuarioService.buscarPorId(usuarioId);
             Vacina vacina = vacinaService.buscarPorId(vacinaId);
             PostoSaude posto = postoService.buscarPorId(postoId);
+            if (!posto.possuiVacina(vacina.getId())) {
+                throw new IllegalArgumentException("O posto selecionado nao possui a vacina escolhida.");
+            }
 
             RegistroVacinacao registro = new RegistroVacinacao(dose, data, vacina, posto);
             registro.setUsuario(usuario);
@@ -193,8 +211,10 @@ public class MvcController {
             usuarioService.cadastrarUsuario(usuario);
 
             redirectAttributes.addFlashAttribute("mensagem", "Vacinacao registrada com sucesso!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erroValidacao", e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensagem", "Erro ao registrar vacinacao.");
+            redirectAttributes.addFlashAttribute("erroValidacao", "Erro ao registrar vacinacao.");
         }
         return "redirect:/registrar";
     }
@@ -214,6 +234,7 @@ public class MvcController {
 
         Usuario usuario = usuarioService.buscarPorEmail(authentication.getName());
         model.addAttribute("usuarioAtual", usuario);
+        model.addAttribute("vacinas", usuarioService.verificarPendencias(usuario.getId()));
         model.addAttribute("agendamentos", agendamentoService.listarPorUsuario(usuario));
         return "index";
     }
@@ -230,8 +251,12 @@ public class MvcController {
         Usuario usuario = isAdmin(authentication) && usuarioId != null
             ? usuarioService.buscarPorId(usuarioId)
             : usuarioService.buscarPorEmail(authentication.getName());
-        agendamentoService.agendar(usuario, vacinaService.buscarPorId(vacinaId), postoService.buscarPorId(postoId), data, horario, observacao);
-        redirectAttributes.addFlashAttribute("mensagem", "Agendamento criado com sucesso!");
+        try {
+            agendamentoService.agendar(usuario, vacinaService.buscarPorId(vacinaId), postoService.buscarPorId(postoId), data, horario, observacao);
+            redirectAttributes.addFlashAttribute("mensagem", "Agendamento criado com sucesso!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erroValidacao", e.getMessage());
+        }
         return "redirect:/agendamentos";
     }
 
@@ -352,6 +377,13 @@ public class MvcController {
     private boolean isAdmin(Authentication authentication) {
         return authentication != null && authentication.getAuthorities().stream()
             .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+    }
+
+    private String formatarDiasFuncionamento(List<String> diasFuncionamento) {
+        if (diasFuncionamento == null || diasFuncionamento.isEmpty()) {
+            return "";
+        }
+        return String.join(",", diasFuncionamento);
     }
 
     private void preencherCarteira(Model model, Authentication authentication) {

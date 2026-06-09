@@ -199,8 +199,15 @@
         <form th:action="@{/postos}" method="get" class="form-panel">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="regiao">Região</label>
-                    <input type="text" id="regiao" name="regiao" class="form-control" placeholder="Ex: Zona Sul" th:value="${regiao}">
+                    <label for="regiao">Zona</label>
+                    <select id="regiao" name="regiao" class="form-control">
+                        <option value="">Todas</option>
+                        <option value="Centro" th:selected="${regiao == 'Centro'}">Centro</option>
+                        <option value="Zona Norte" th:selected="${regiao == 'Zona Norte'}">Zona Norte</option>
+                        <option value="Zona Sul" th:selected="${regiao == 'Zona Sul'}">Zona Sul</option>
+                        <option value="Zona Leste" th:selected="${regiao == 'Zona Leste'}">Zona Leste</option>
+                        <option value="Zona Oeste" th:selected="${regiao == 'Zona Oeste'}">Zona Oeste</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="vacinaNome">Vacina desejada</label>
@@ -222,7 +229,7 @@
             <div th:each="p : ${postos}" class="card">
                 <h3 class="card-title" th:text="${p.nome}"></h3>
                 <p>Endereço: <strong th:text="${p.endereco}"></strong></p>
-                <p>Horário: <strong th:text="${p.horarioFuncionamento}"></strong></p>
+                <p>Horario: <strong th:text="${p.horarioFuncionamentoFormatado}"></strong></p>
                 <p>Telefone: <strong th:text="${p.telefone}"></strong></p>
             </div>
         </div>
@@ -254,20 +261,47 @@
                             <input type="text" id="postoNome" name="nome" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="postoRegiao">Região</label>
-                            <input type="text" id="postoRegiao" name="regiao" class="form-control" required>
+                            <label for="postoCep">CEP</label>
+                            <input type="text" id="postoCep" name="cep" class="form-control" inputmode="numeric" placeholder="00000-000" required>
                         </div>
                         <div class="form-group">
-                            <label for="postoEndereco">Endereço</label>
+                            <label for="postoRegiao">Zona</label>
+                            <select id="postoRegiao" name="regiao" class="form-control" required>
+                                <option value="">Selecione</option>
+                                <option value="Centro">Centro</option>
+                                <option value="Zona Norte">Zona Norte</option>
+                                <option value="Zona Sul">Zona Sul</option>
+                                <option value="Zona Leste">Zona Leste</option>
+                                <option value="Zona Oeste">Zona Oeste</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="postoEndereco">Endereco</label>
                             <input type="text" id="postoEndereco" name="endereco" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="postoHorario">Horário</label>
-                            <input type="text" id="postoHorario" name="horarioFuncionamento" class="form-control" required>
+                            <label for="postoTelefone">Telefone</label>
+                            <input type="text" id="postoTelefone" name="telefone" class="form-control" inputmode="tel" placeholder="(11) 99999-9999" required>
                         </div>
                         <div class="form-group">
-                            <label for="postoTelefone">Telefone</label>
-                            <input type="text" id="postoTelefone" name="telefone" class="form-control" required>
+                            <label for="postoHoraAbertura">Abertura</label>
+                            <input type="time" id="postoHoraAbertura" name="horaAbertura" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postoHoraFechamento">Fechamento</label>
+                            <input type="time" id="postoHoraFechamento" name="horaFechamento" class="form-control" required>
+                        </div>
+                        <div class="form-group form-group--full">
+                            <label>Dias de funcionamento</label>
+                            <div class="checkbox-grid checkbox-grid--days">
+                                <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="MONDAY" checked><span><strong>Segunda</strong></span></label>
+                                <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="TUESDAY" checked><span><strong>Terca</strong></span></label>
+                                <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="WEDNESDAY" checked><span><strong>Quarta</strong></span></label>
+                                <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="THURSDAY" checked><span><strong>Quinta</strong></span></label>
+                                <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="FRIDAY" checked><span><strong>Sexta</strong></span></label>
+                                <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="SATURDAY"><span><strong>Sabado</strong></span></label>
+                                <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="SUNDAY"><span><strong>Domingo</strong></span></label>
+                            </div>
                         </div>
                         <div class="form-group form-group--full">
                             <label>Vacinas disponiveis</label>
@@ -295,7 +329,7 @@
                         <div>
                             <h3 class="card-title" th:text="${p.nome}">Posto</h3>
                             <p th:text="${p.endereco}"></p>
-                            <p class="card-meta" th:text="${p.regiao + ' - ' + p.horarioFuncionamento}"></p>
+                            <p class="card-meta" th:text="${p.regiao + ' - ' + p.horarioFuncionamentoFormatado}"></p>
                         </div>
                         <div class="icon-actions">
                             <button type="button" class="icon-button" th:attr="data-modal-open=${'modal-editar-posto-' + p.id}" aria-label="Editar posto">
@@ -325,20 +359,46 @@
                                     <input type="text" th:id="${'postoNome' + p.id}" name="nome" class="form-control" th:value="${p.nome}" required>
                                 </div>
                                 <div class="form-group">
-                                    <label th:for="${'postoRegiao' + p.id}">Região</label>
-                                    <input type="text" th:id="${'postoRegiao' + p.id}" name="regiao" class="form-control" th:value="${p.regiao}" required>
+                                    <label th:for="${'postoCep' + p.id}">CEP</label>
+                                    <input type="text" th:id="${'postoCep' + p.id}" name="cep" class="form-control" inputmode="numeric" placeholder="00000-000" th:value="${p.cep}" required>
                                 </div>
                                 <div class="form-group">
-                                    <label th:for="${'postoEndereco' + p.id}">Endereço</label>
+                                    <label th:for="${'postoRegiao' + p.id}">Zona</label>
+                                    <select th:id="${'postoRegiao' + p.id}" name="regiao" class="form-control" required>
+                                        <option value="Centro" th:selected="${p.regiao == 'Centro'}">Centro</option>
+                                        <option value="Zona Norte" th:selected="${p.regiao == 'Zona Norte'}">Zona Norte</option>
+                                        <option value="Zona Sul" th:selected="${p.regiao == 'Zona Sul'}">Zona Sul</option>
+                                        <option value="Zona Leste" th:selected="${p.regiao == 'Zona Leste'}">Zona Leste</option>
+                                        <option value="Zona Oeste" th:selected="${p.regiao == 'Zona Oeste'}">Zona Oeste</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'postoEndereco' + p.id}">Endereco</label>
                                     <input type="text" th:id="${'postoEndereco' + p.id}" name="endereco" class="form-control" th:value="${p.endereco}" required>
                                 </div>
                                 <div class="form-group">
-                                    <label th:for="${'postoHorario' + p.id}">Horário</label>
-                                    <input type="text" th:id="${'postoHorario' + p.id}" name="horarioFuncionamento" class="form-control" th:value="${p.horarioFuncionamento}" required>
+                                    <label th:for="${'postoTelefone' + p.id}">Telefone</label>
+                                    <input type="text" th:id="${'postoTelefone' + p.id}" name="telefone" class="form-control" inputmode="tel" placeholder="(11) 99999-9999" th:value="${p.telefone}" required>
                                 </div>
                                 <div class="form-group">
-                                    <label th:for="${'postoTelefone' + p.id}">Telefone</label>
-                                    <input type="text" th:id="${'postoTelefone' + p.id}" name="telefone" class="form-control" th:value="${p.telefone}" required>
+                                    <label th:for="${'postoHoraAbertura' + p.id}">Abertura</label>
+                                    <input type="time" th:id="${'postoHoraAbertura' + p.id}" name="horaAbertura" class="form-control" th:value="${p.horaAbertura}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label th:for="${'postoHoraFechamento' + p.id}">Fechamento</label>
+                                    <input type="time" th:id="${'postoHoraFechamento' + p.id}" name="horaFechamento" class="form-control" th:value="${p.horaFechamento}" required>
+                                </div>
+                                <div class="form-group form-group--full">
+                                    <label>Dias de funcionamento</label>
+                                    <div class="checkbox-grid checkbox-grid--days">
+                                        <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="MONDAY" th:checked="${p.funcionaNoDia('MONDAY')}"><span><strong>Segunda</strong></span></label>
+                                        <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="TUESDAY" th:checked="${p.funcionaNoDia('TUESDAY')}"><span><strong>Terca</strong></span></label>
+                                        <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="WEDNESDAY" th:checked="${p.funcionaNoDia('WEDNESDAY')}"><span><strong>Quarta</strong></span></label>
+                                        <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="THURSDAY" th:checked="${p.funcionaNoDia('THURSDAY')}"><span><strong>Quinta</strong></span></label>
+                                        <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="FRIDAY" th:checked="${p.funcionaNoDia('FRIDAY')}"><span><strong>Sexta</strong></span></label>
+                                        <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="SATURDAY" th:checked="${p.funcionaNoDia('SATURDAY')}"><span><strong>Sabado</strong></span></label>
+                                        <label class="checkbox-card"><input type="checkbox" name="diasFuncionamento" value="SUNDAY" th:checked="${p.funcionaNoDia('SUNDAY')}"><span><strong>Domingo</strong></span></label>
+                                    </div>
                                 </div>
                                 <div class="form-group form-group--full">
                                     <label>Vacinas disponiveis</label>
@@ -408,7 +468,8 @@
                 <div class="form-group">
                     <label for="postoId">Posto de Saúde</label>
                     <select id="postoId" name="postoId" class="form-control" required>
-                        <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome}"></option>
+                        <option value="">Selecione</option>
+                        <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome}" th:attr="data-vacinas=${p.vacinaIdsCsv},data-dias=${p.diasFuncionamento},data-hora-abertura=${p.horaAbertura},data-hora-fechamento=${p.horaFechamento}"></option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -425,6 +486,7 @@
             </div>
         </form>
         <div th:if="${mensagem != null}" class="status-message status-message--success" th:text="${mensagem}"></div>
+        <div th:if="${erroValidacao != null}" class="status-message status-message--danger" th:text="${erroValidacao}"></div>
     </div>
 
     <div th:fragment="pendencias">
@@ -492,13 +554,15 @@
                 <div class="form-group">
                     <label for="agendamentoVacina">Vacina</label>
                     <select id="agendamentoVacina" name="vacinaId" class="form-control" required>
+                        <option value="">Selecione a vacina</option>
                         <option th:each="v : ${vacinas}" th:value="${v.id}" th:text="${v.nome}"></option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="agendamentoPosto">Posto</label>
                     <select id="agendamentoPosto" name="postoId" class="form-control" required>
-                        <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome + ' - ' + p.regiao}"></option>
+                        <option value="">Selecione o posto</option>
+                        <option th:each="p : ${postos}" th:value="${p.id}" th:text="${p.nome + ' - ' + p.regiao}" th:attr="data-vacinas=${p.vacinaIdsCsv},data-dias=${p.diasFuncionamento},data-hora-abertura=${p.horaAbertura},data-hora-fechamento=${p.horaFechamento}"></option>
                     </select>
                 </div>
                 <div class="form-group">
