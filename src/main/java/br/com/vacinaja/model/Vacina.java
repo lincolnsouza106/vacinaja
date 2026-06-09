@@ -15,6 +15,7 @@ public class Vacina {
     private int idadeMinima;
     private int idadeMaxima;
     private int dosesNecessarias;
+    @Column(name = "intervalo_dias")
     private int intervaloDoses;
 
     public Vacina() {}

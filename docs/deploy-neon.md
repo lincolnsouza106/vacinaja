@@ -33,6 +33,10 @@ jdbc:postgresql://host/banco?sslmode=require
 Depois informe usuario e senha pelas variaveis `SPRING_DATASOURCE_USERNAME` e
 `SPRING_DATASOURCE_PASSWORD`.
 
+Confira tambem se o host do Neon esta completo. Ele normalmente termina com
+`.neon.tech`. Se terminar apenas em `.aws`, a aplicacao vai falhar com
+`UnknownHostException` porque o DNS nao consegue encontrar o banco.
+
 ## Banco e migrations
 
 No perfil `neon`, o Flyway usa as migrations em:
